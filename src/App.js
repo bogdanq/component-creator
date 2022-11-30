@@ -1,127 +1,238 @@
-import { useStore } from "effector-react";
-import { useEffect, useReducer, useState } from "react";
-import { createPortal } from "react-dom";
+import { useState } from "react";
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+  PopoverCloseButton,
+  PopoverArrow,
+  PopoverHeader,
+  PopoverBody,
+  Button,
+  Stack,
+  Tooltip,
+  Flex,
+  Box,
+  Text,
+} from "@chakra-ui/react";
+import { Resizable } from "react-resizable";
+import { Tree } from "./tree";
+import { useZoom } from "./use-zoom";
 import "./app.css";
 import {
-  $activeComponentId,
-  $components,
-  $isDubbleClick,
-  addComponent,
-  dubbleClick,
-  removeComponent,
-  selectComponent,
-} from "./creator-components/model";
-import { useZoom } from "./use-zoom";
+  $activeElement,
+  addComponentToTree,
+  removeComponentFromTree,
+} from "./model";
+import classNames from "classnames";
+import { useStore } from "effector-react";
 
-const Modal = ({ jsx, event }) => {
-  const modalRoot = document.getElementById("modal-root");
-  const cs = event.target.getBoundingClientRect();
+const GRID_WIDTH = 102;
 
-  const element = (
-    <div
-      className="popup"
-      style={{
-        top: cs.top + cs.height,
-        left: cs.left,
-      }}
-    >
-      <div>{jsx}</div>
-    </div>
+const SIZE = [
+  {
+    img: "https://tilda.cc/zero/img/tn-razreshenie_1a.svg",
+    size: 320,
+    name: "320-480",
+  },
+  {
+    img: "https://tilda.cc/zero/img/tn-razreshenie_2a.svg",
+    size: 480,
+    name: "480-640",
+  },
+  {
+    img: "https://tilda.cc/zero/img/tn-razreshenie_3a.svg",
+    size: 640,
+    name: "640-960",
+  },
+  {
+    img: "https://tilda.cc/zero/img/tn-razreshenie_4a.svg",
+    size: 960,
+    name: "960-1200",
+  },
+  {
+    img: "https://tilda.cc/zero/img/tn-razreshenie_5a.svg",
+    size: 1200,
+    name: "1200-max",
+  },
+];
+
+const PaperResizeble = ({ contentRef, progress, width }) => {
+  const [height, setHeight] = useState(600);
+
+  const onResize = (_, { size }) => {
+    setHeight(size.height);
+  };
+
+  const gridCount = Math.ceil(width / GRID_WIDTH);
+
+  return (
+    <Resizable height={height} width={width} onResize={onResize}>
+      <div
+        ref={contentRef}
+        className="content"
+        style={{ width: `${width}px`, height }}
+      >
+        <Tree progress={progress} />
+
+        {Array.from({ length: gridCount }).map((_, index) => (
+          <div
+            className="content-grid"
+            key={index}
+            style={{ left: index * GRID_WIDTH }}
+          />
+        ))}
+      </div>
+    </Resizable>
   );
+};
 
-  return createPortal(element, modalRoot);
+const ElementsSettingsBlock = ({ activeElement }) => {
+  return (
+    <Box>
+      <Flex alignItems="center" justifyContent="space-between">
+        <Flex w="35%">
+          <Text fontSize="sm">Actions</Text>
+        </Flex>
+
+        <Flex justifyContent="space-between" w="65%">
+          <Button
+            colorScheme="black"
+            color="black"
+            border="1px solid rgba(0,0,0,.2)"
+            size="xs"
+            onClick={() => removeComponentFromTree(activeElement.id)}
+          >
+            Delete
+          </Button>
+          <Button
+            colorScheme="black"
+            color="black"
+            border="1px solid rgba(0,0,0,.2)"
+            size="xs"
+          >
+            Copy
+          </Button>
+          <Button
+            colorScheme="black"
+            color="black"
+            border="1px solid rgba(0,0,0,.2)"
+            size="xs"
+          >
+            Lock
+          </Button>
+        </Flex>
+      </Flex>
+    </Box>
+  );
 };
 
 export function App() {
-  const activeComponentId = useStore($activeComponentId);
-  const components = useStore($components);
-  const isDubbleClick = useStore($isDubbleClick);
-
   const { wrapperRef, zoomReset, contentRef, progress } = useZoom();
-  const [modalState, toggle] = useReducer(
-    (s, event) => ({ isOpen: !s.isOpen, event }),
-    {
-      isOpen: false,
-      event: null,
-    }
-  );
 
-  const [w, sw] = useState("1200px");
+  const [w, sw] = useState(1200);
 
-  useEffect(() => {
-    const listener = (e) => {
-      const id = e.target.closest("[data-component-id]");
+  const activeElement = useStore($activeElement);
 
-      if (!id) {
-        selectComponent(null);
-      }
-    };
-
-    window.addEventListener("click", listener);
-
-    return () => window.removeEventListener("click", listener);
-  }, [activeComponentId]);
-
-  useEffect(() => {
-    dubbleClick(false);
-  }, [activeComponentId]);
+  const hendleChangeWidth = (w) => {
+    zoomReset();
+    sw(w);
+  };
 
   return (
     <div>
-      {modalState.isOpen && (
-        <Modal
-          event={modalState.event}
-          jsx={
-            <div>
-              <p onClick={() => addComponent("text")}>Add text</p>
-              <p onClick={() => addComponent("button")}>Add button</p>
-              <p onClick={() => addComponent("image")}>Add image</p>
-            </div>
-          }
-        />
-      )}
-
-      <div ref={wrapperRef} className="zoom-wrapper">
+      <div ref={wrapperRef} className="zoom-work">
         <div className="tn-mainmenu">
-          <div className="mainmenu-left">
-            <div className="addBtn" onClick={toggle} />
+          <Flex alignItems="center" w="12%" justifyContent="space-between">
+            <Popover placement="bottom-end">
+              <PopoverTrigger>
+                <button className="addBtn" />
+              </PopoverTrigger>
+              <PopoverContent w="250px">
+                <PopoverArrow />
+                <PopoverCloseButton />
+                <PopoverHeader>Select element</PopoverHeader>
+                <PopoverBody>
+                  <Stack align="start">
+                    <Button
+                      onClick={() => addComponentToTree("text")}
+                      colorScheme="teal"
+                      variant="link"
+                      justifyContent="start"
+                    >
+                      Text
+                    </Button>
+                    <Button
+                      onClick={() => addComponentToTree("button")}
+                      colorScheme="teal"
+                      textAlign="left"
+                      variant="link"
+                      justifyContent="start"
+                    >
+                      Button
+                    </Button>
+                    <Button
+                      onClick={() => addComponentToTree("image")}
+                      colorScheme="teal"
+                      textAlign="left"
+                      variant="link"
+                      justifyContent="start"
+                    >
+                      Image
+                    </Button>
+                  </Stack>
+                </PopoverBody>
+              </PopoverContent>
+            </Popover>
 
-            <div className="reset-block">
-              <p>{progress} %</p>
-              <button onClick={zoomReset}>reset</button>
-            </div>
-          </div>
-          <button onClick={() => sw("360px")}>mb</button>
-          <button onClick={() => sw("660px")}>tab</button>
-          <button onClick={() => sw("1200px")}>desc</button>
+            <p>{progress} %</p>
+            <Button
+              onClick={zoomReset}
+              size="sm"
+              background="white"
+              colorScheme="black"
+              color="black"
+            >
+              reset
+            </Button>
+          </Flex>
+
+          <Flex justifyContent="center">
+            {SIZE.map((i) => (
+              <Tooltip key={i.img} label={i.name}>
+                <img
+                  className={classNames({ imageActive: i.size === w })}
+                  src={i.img}
+                  onClick={() => hendleChangeWidth(i.size)}
+                  alt="mobile"
+                />
+              </Tooltip>
+            ))}
+          </Flex>
+
+          <Flex w="10%">
+            <Button
+              background="white"
+              size="sm"
+              colorScheme="black"
+              color="black"
+            >
+              save
+            </Button>
+          </Flex>
         </div>
         <div className="tn-right-box">
           <div className="tn-right__header">
-            <span>Artboard settings</span>
+            <Text textTransform="uppercase" fontSize="sm">
+              Artboard settings
+            </Text>
+
+            {activeElement && (
+              <ElementsSettingsBlock activeElement={activeElement} />
+            )}
           </div>
-          {activeComponentId && (
-            <div className="panelItem">
-              <span
-                onClick={() => removeComponent(activeComponentId)}
-                className="panelItemTitle"
-              >
-                remove X
-              </span>
-            </div>
-          )}
         </div>
 
-        <div ref={contentRef} className="content" style={{ maxWidth: w }}>
-          {components.map((component) => (
-            <component.component
-              key={component.id}
-              id={component.id}
-              isActive={activeComponentId === component.id}
-              isDubbleClick={isDubbleClick}
-              progress={progress}
-            />
-          ))}
-        </div>
+        <PaperResizeble contentRef={contentRef} progress={progress} width={w} />
       </div>
     </div>
   );
