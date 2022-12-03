@@ -22,7 +22,10 @@ const ElementsStyleSettingsBlock = ({ activeElement }) => {
   const elementActions = [
     { title: "Delete", action: () => removeElementFromTree(activeElement) },
     { title: "Copy", action: () => copyTreeElement(activeElement) },
-    { title: "Lock", action: () => disabledElement(activeElement) },
+    {
+      title: activeElement.disabled ? "UnLock" : "Lock",
+      action: () => disabledElement(activeElement),
+    },
   ];
 
   return (
@@ -34,13 +37,13 @@ const ElementsStyleSettingsBlock = ({ activeElement }) => {
           </Text>
         </Flex>
         <Flex justifyContent="space-between" w="65%">
-          {elementActions.map((action) => (
+          {elementActions.map((action, idx) => (
             <Button
+              key={idx}
               colorScheme="black"
               color="black"
               border="1px solid rgba(0,0,0,.2)"
               size="xs"
-              key={action.title}
               onClick={action.action}
             >
               {action.title}
