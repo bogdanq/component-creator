@@ -6,7 +6,7 @@ export const ContentEditable = styled(ContentEditableDefault)`
   overflow-wrap: anywhere;
 `;
 
-export const Button = styled.div`
+export const Button = styled(ContentEditable)`
   color: rgb(255, 255, 255);
   background-color: rgb(0, 0, 0);
   opacity: 1;
@@ -17,7 +17,7 @@ export const Button = styled.div`
   transition: background-color 0.2s ease-in-out 0s, color 0.2s ease-in-out 0s,
     border-color 0.2s ease-in-out 0s;
   outline: none;
-  height: 100%;
+  min-height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -52,7 +52,7 @@ export const ComputedStyles = styled.span`
   line-height: 20px;
 `;
 
-export const Text = styled.div`
+export const Text = styled(ContentEditable)`
   outline: none;
   overflow-wrap: anywhere;
 `;

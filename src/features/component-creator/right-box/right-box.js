@@ -1,10 +1,20 @@
-import { Text, Flex, Button } from "@chakra-ui/react";
+import {
+  Text,
+  Flex,
+  Button,
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
+  NumberIncrementStepper,
+  NumberDecrementStepper,
+} from "@chakra-ui/react";
 import { useStore } from "effector-react";
 import {
   removeElementFromTree,
   copyTreeElement,
   disabledElement,
   $activeElement,
+  handleChangeStyle,
 } from "../model";
 import { BoxWrapper, BoxHeader, PanelItem } from "./styled";
 
@@ -16,7 +26,7 @@ const ElementsStyleSettingsBlock = ({ activeElement }) => {
   ];
 
   return (
-    <PanelItem className="tn-right-box">
+    <PanelItem>
       <Flex alignItems="center" justifyContent="space-between">
         <Flex w="35%">
           <Text fontSize="sm" opacity="0.5">
@@ -42,69 +52,81 @@ const ElementsStyleSettingsBlock = ({ activeElement }) => {
   );
 };
 
-const ElementsComputedStylesBlock = () => {
+const NumberField = ({ onChange, value }) => {
+  return (
+    <NumberInput
+      onChange={(v) => onChange(Number(v))}
+      value={value}
+      focusBorderColor="#00000033"
+      size="xs"
+    >
+      <NumberInputField />
+
+      <NumberInputStepper>
+        <NumberIncrementStepper />
+        <NumberDecrementStepper />
+      </NumberInputStepper>
+    </NumberInput>
+  );
+};
+
+const ElementsComputedStylesBlock = ({ activeElement }) => {
+  const { style } = activeElement.attributes;
+
   return (
     <PanelItem>
-      <Flex alignItems="center" justifyContent="space-between">
-        <Flex w="40%" justifyContent="space-between">
+      <Flex direction="column">
+        <Flex justifyContent="space-between">
           <Text fontSize="sm" opacity="0.5">
             X
           </Text>
 
-          <Button
-            colorScheme="black"
-            color="black"
-            border="1px solid rgba(0,0,0,.2)"
-            size="xs"
-          >
-            x px
-          </Button>
+          <NumberField
+            onChange={(value) =>
+              handleChangeStyle({ value, name: "x", id: activeElement.id })
+            }
+            value={style.x}
+          />
         </Flex>
 
-        <Flex w="40%" justifyContent="space-between">
+        <Flex mt="25px" justifyContent="space-between">
           <Text fontSize="sm" opacity="0.5">
             Y
           </Text>
 
-          <Button
-            colorScheme="black"
-            color="black"
-            border="1px solid rgba(0,0,0,.2)"
-            size="xs"
-          >
-            y px
-          </Button>
+          <NumberField
+            onChange={(value) =>
+              handleChangeStyle({ value, name: "y", id: activeElement.id })
+            }
+            value={style.y}
+          />
         </Flex>
       </Flex>
-      <Flex mt="25px" alignItems="center" justifyContent="space-between">
-        <Flex w="40%" justifyContent="space-between">
+      <Flex mt="25px" direction="column">
+        <Flex justifyContent="space-between">
           <Text fontSize="sm" opacity="0.5">
             Width
           </Text>
 
-          <Button
-            colorScheme="black"
-            color="black"
-            border="1px solid rgba(0,0,0,.2)"
-            size="xs"
-          >
-            w px
-          </Button>
+          <NumberField
+            onChange={(value) =>
+              handleChangeStyle({ value, name: "width", id: activeElement.id })
+            }
+            value={style.width}
+          />
         </Flex>
 
-        <Flex w="40%" justifyContent="space-between">
+        <Flex mt="25px" justifyContent="space-between">
           <Text fontSize="sm" opacity="0.5">
             Height
           </Text>
 
-          <Button
-            colorScheme="black"
-            color="black"
-            border="1px solid rgba(0,0,0,.2)"
-            size="xs"
-          >
-            h px
-          </Button>
+          <NumberField
+            onChange={(value) =>
+              handleChangeStyle({ value, name: "height", id: activeElement.id })
+            }
+            value={style.height}
+          />
         </Flex>
       </Flex>
     </PanelItem>
@@ -115,7 +137,7 @@ export const RightSideBox = () => {
   const activeElement = useStore($activeElement);
 
   return (
-    <BoxWrapper>
+    <BoxWrapper className="setting-box">
       <BoxHeader>
         <Text opacity="0.4" textTransform="uppercase" fontSize="sm">
           Artboard settings
@@ -124,7 +146,7 @@ export const RightSideBox = () => {
 
       {activeElement && (
         <>
-          <ElementsComputedStylesBlock />
+          <ElementsComputedStylesBlock activeElement={activeElement} />
           <ElementsStyleSettingsBlock activeElement={activeElement} />
         </>
       )}

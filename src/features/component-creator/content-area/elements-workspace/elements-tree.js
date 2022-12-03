@@ -1,3 +1,4 @@
+import { combine } from "effector";
 import { useStore } from "effector-react";
 import { useEffect } from "react";
 import {
@@ -9,28 +10,63 @@ import {
   handleChangeTextContent,
 } from "../../model";
 import { WithDraggable, WithResizable } from "./index";
-import {
-  Button,
-  Shape,
-  Image,
-  Wrapper,
-  ComputedStyles,
-  Text,
-  ContentEditable,
-} from "./styled";
+import { Button, Shape, Image, Wrapper, ComputedStyles, Text } from "./styled";
+
+const ElementItem = ({ type, content, id, isDubbleClick }) => {
+  if (type === "shape") {
+    return <Shape className="shape content-area" />;
+  }
+
+  if (type === "image") {
+    return (
+      <Image className="image content-area" src={content} alt="content img" />
+    );
+  }
+
+  if (type === "button") {
+    return (
+      <Button
+        className="button content-area"
+        disabled={!isDubbleClick}
+        html={content}
+        onChange={(e) => {
+          handleChangeTextContent({ text: e.target.value, id });
+        }}
+        tagName="article"
+      />
+    );
+  }
+
+  if (type === "text") {
+    return (
+      <Text
+        className="text content-area"
+        disabled={!isDubbleClick}
+        html={content}
+        onChange={(e) => {
+          handleChangeTextContent({ text: e.target.value, id });
+        }}
+        tagName="article"
+      />
+    );
+  }
+};
+
+const $state = combine({
+  tree: $componentsTree,
+  activeElement: $activeElement,
+  dubleClickElementId: $dubleClickElementId,
+});
 
 export const ElementsTree = ({ progress }) => {
-  const tree = useStore($componentsTree);
-  const activeElement = useStore($activeElement);
-  const dubleClickElementId = useStore($dubleClickElementId);
+  const { tree, activeElement, dubleClickElementId } = useStore($state);
 
   useEffect(() => {
     const listener = (e) => {
       const id = e.target.closest("[data-component-id]");
-      const isSettingBox = !!e.target.closest(".tn-right-box");
-      const isRightTreeBox = !!e.target.closest(".tn-left-box");
+      const isSettingBox = !!e.target.closest(".setting-box");
 
-      if (!id && !isSettingBox && !isRightTreeBox) {
+      if (!id && !isSettingBox) {
         setActiveElement(null);
       }
     };
@@ -74,10 +110,11 @@ export const ElementsTree = ({ progress }) => {
           {(ref) => (
             <Wrapper
               type={type}
+              className={`${type}-wrapper`}
               isActive={isActive}
               dubbleActive={isDubbleClick}
               ref={ref}
-              onMouseDown={() => setActiveElement(element)}
+              onMouseDown={() => setActiveElement(element.id)}
               onDoubleClick={() => doubleClickElement(element.id)}
               data-component-id={id}
               style={
@@ -89,46 +126,20 @@ export const ElementsTree = ({ progress }) => {
                   : {}
               }
             >
-              {isActive && (
-                <ComputedStyles>{`${Math.round(style.width)} x ${Math.round(
-                  style.height
-                )}`}</ComputedStyles>
-              )}
+              <>
+                {isActive && (
+                  <ComputedStyles>{`${Math.round(style.width)} x ${Math.round(
+                    style.height
+                  )}`}</ComputedStyles>
+                )}
 
-              {type === "shape" && <Shape className="content-area" />}
-              {type === "image" && (
-                <Image
-                  className="content-area"
-                  src={content}
-                  alt="content img"
+                <ElementItem
+                  type={type}
+                  content={content}
+                  id={id}
+                  isDubbleClick={isDubbleClick}
                 />
-              )}
-              {type === "button" && (
-                <Button className="content-area">
-                  <ContentEditable
-                    disabled={!isDubbleClick}
-                    html={content}
-                    onChange={(e) => {
-                      handleChangeTextContent({ text: e.target.value, id });
-                    }}
-                    tagName="article"
-                  />
-                </Button>
-              )}
-
-              {type === "text" && (
-                <Text>
-                  <ContentEditable
-                    className="content-area"
-                    disabled={!isDubbleClick}
-                    html={content}
-                    onChange={(e) => {
-                      handleChangeTextContent({ text: e.target.value, id });
-                    }}
-                    tagName="article"
-                  />
-                </Text>
-              )}
+              </>
             </Wrapper>
           )}
         </WithResizable>

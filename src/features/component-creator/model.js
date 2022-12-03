@@ -1,4 +1,4 @@
-import { createEvent, createStore, restore } from "effector";
+import { combine, createEvent, createStore, restore } from "effector";
 import { nanoid } from "nanoid";
 
 const DEFAULT_ATTRIBUTES = {
@@ -27,7 +27,7 @@ export const COMPONENT_TYPES = {
   },
 };
 
-const tree = [
+const initialTree = [
   {
     id: "1",
     attributes: DEFAULT_ATTRIBUTES,
@@ -60,11 +60,12 @@ export const disabledElement = createEvent();
 // изменение позиции и ширины елемента
 export const handleChangeElementPosition = createEvent();
 export const handleChangeResize = createEvent();
+export const handleChangeStyle = createEvent();
 
 // изменение текстового контента елемента
 export const handleChangeTextContent = createEvent();
 
-export const $componentsTree = createStore(tree)
+export const $componentsTree = createStore(initialTree)
   .on(handleChangeElementPosition, (tree, { position, id }) =>
     tree.map((element) => {
       if (element.id === id) {
@@ -95,6 +96,24 @@ export const $componentsTree = createStore(tree)
               ...element.attributes.style,
               width: width,
               height: height,
+            },
+          },
+        };
+      }
+
+      return element;
+    })
+  )
+  .on(handleChangeStyle, (tree, { name, value, id }) =>
+    tree.map((element) => {
+      if (element.id === id) {
+        return {
+          ...element,
+          attributes: {
+            ...element.attributes,
+            style: {
+              ...element.attributes.style,
+              [name]: value,
             },
           },
         };
@@ -153,8 +172,14 @@ export const $componentsTree = createStore(tree)
     });
   });
 
-export const $activeElement = restore(setActiveElement, null).reset(
+export const $activeElementId = restore(setActiveElement, null).reset(
   removeElementFromTree
+);
+
+export const $activeElement = combine([$activeElementId, $componentsTree]).map(
+  ([id, tree]) => {
+    return tree.find((element) => element.id === id) ?? null;
+  }
 );
 
 export const $dubleClickElementId = restore(doubleClickElement, null);

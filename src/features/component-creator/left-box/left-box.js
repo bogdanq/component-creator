@@ -14,7 +14,7 @@ export const LeftSideBox = () => {
   const { tree, activeElement } = useStore($state);
 
   return (
-    <BoxWrapper className="tn-left-box">
+    <BoxWrapper className="setting-box">
       <BoxHeader>
         <Box pos="fixed" bg="#ebebeb" left="10px" w="150px">
           <Text opacity="0.4" textTransform="uppercase" fontSize="sm" pl="15px">
@@ -30,7 +30,7 @@ export const LeftSideBox = () => {
               cursor="pointer"
               padding="15px 0"
               key={element.id}
-              onClick={() => setActiveElement(element)}
+              onClick={() => setActiveElement(element.id)}
             >
               <Box>
                 <Text
