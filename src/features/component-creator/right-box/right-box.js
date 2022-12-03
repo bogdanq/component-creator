@@ -59,6 +59,7 @@ const NumberField = ({ onChange, value }) => {
       value={value}
       focusBorderColor="#00000033"
       size="xs"
+      step={1}
     >
       <NumberInputField />
 
@@ -78,9 +79,8 @@ const ElementsComputedStylesBlock = ({ activeElement }) => {
       <Flex direction="column">
         <Flex justifyContent="space-between">
           <Text fontSize="sm" opacity="0.5">
-            X
+            X (px)
           </Text>
-
           <NumberField
             onChange={(value) =>
               handleChangeStyle({ value, name: "x", id: activeElement.id })
@@ -91,9 +91,8 @@ const ElementsComputedStylesBlock = ({ activeElement }) => {
 
         <Flex mt="25px" justifyContent="space-between">
           <Text fontSize="sm" opacity="0.5">
-            Y
+            Y (px)
           </Text>
-
           <NumberField
             onChange={(value) =>
               handleChangeStyle({ value, name: "y", id: activeElement.id })
@@ -105,9 +104,8 @@ const ElementsComputedStylesBlock = ({ activeElement }) => {
       <Flex mt="25px" direction="column">
         <Flex justifyContent="space-between">
           <Text fontSize="sm" opacity="0.5">
-            Width
+            Width (px)
           </Text>
-
           <NumberField
             onChange={(value) =>
               handleChangeStyle({ value, name: "width", id: activeElement.id })
@@ -118,9 +116,8 @@ const ElementsComputedStylesBlock = ({ activeElement }) => {
 
         <Flex mt="25px" justifyContent="space-between">
           <Text fontSize="sm" opacity="0.5">
-            Height
+            Height (px)
           </Text>
-
           <NumberField
             onChange={(value) =>
               handleChangeStyle({ value, name: "height", id: activeElement.id })

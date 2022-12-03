@@ -1,4 +1,5 @@
 import styled from "@emotion/styled";
+import { css } from "@emotion/react";
 import ContentEditableDefault from "react-contenteditable";
 
 export const ContentEditable = styled(ContentEditableDefault)`
@@ -41,6 +42,7 @@ export const Shape = styled.div`
 `;
 
 export const ComputedStyles = styled.span`
+  cursor: ${(p) => (p.isActive ? "grab" : "")};
   position: absolute;
   background-color: #8b8bea;
   padding: 0px 5px;
@@ -48,8 +50,12 @@ export const ComputedStyles = styled.span`
   font-weight: normal;
   font-size: 12px;
   bottom: -22px;
-  left: calc(50% - 30px);
   line-height: 20px;
+  display: flex;
+  justify-content: center;
+  left: calc(50% - 40px);
+  line-height: 20px;
+  width: 80px;
 `;
 
 export const Text = styled(ContentEditable)`
@@ -57,60 +63,60 @@ export const Text = styled(ContentEditable)`
   overflow-wrap: anywhere;
 `;
 
-export const Wrapper = styled.div`
-  ${(p) =>
-    p.type === "text" &&
-    `
-      position: absolute !important;
-      top: 70px;
-      left: 0;
-      text-align: left;
-      font-size: 20px;
-      line-height: 31px;
-      font-weight: 400;
-      letter-spacing: 0px;
-      width: 200px;
-      border: 1px solid transparent;
-    `}
-  ${(p) =>
-    p.type === "button" &&
-    `
-      position: absolute !important;
-      text-align: center;
-      font-size: 14px;
-      line-height: 22px;
-      font-family: Arial;
-      font-weight: 600;
-      letter-spacing: 0px;
-      width: 150px;
-      height: 40px;
-      border: 1px solid transparent;
-    `}
-  ${(p) =>
-    p.type === "image" &&
-    `
-      width: 200px;
-      height: 200px;
-      position: absolute !important;
-      top: 280px;
-      left: 0;
-      display: block;
-    `}
-  ${(p) =>
-    p.type === "shape" &&
-    `
-      width: 100px;
-      height: 100px;
-      position: absolute !important;
-      top: 0px;
-      left: 200px;
-    `}
+const TextWrapper = css`
+  position: absolute !important;
+  top: 70px;
+  left: 0;
+  text-align: left;
+  font-size: 20px;
+  line-height: 31px;
+  font-weight: 400;
+  letter-spacing: 0px;
+  width: 200px;
+  border: 1px solid transparent;
+`;
+
+const ButtonContainer = css`
+  position: absolute !important;
+  text-align: center;
+  font-size: 14px;
+  line-height: 22px;
+  font-family: Arial;
+  font-weight: 600;
+  letter-spacing: 0px;
+  width: 150px;
+  height: 40px;
+  border: 1px solid transparent;
+`;
+
+const ImageContainer = css`
+  width: 200px;
+  height: 200px;
+  position: absolute !important;
+  top: 280px;
+  left: 0;
+  display: block;
+`;
+
+const ShapeContainer = css`
+  width: 100px;
+  height: 100px;
+  position: absolute !important;
+  top: 0px;
+  left: 200px;
+`;
+
+export const ElementWrapper = styled.div`
+  ${(p) => p.type === "text" && TextWrapper}
+  ${(p) => p.type === "button" && ButtonContainer}
+  ${(p) => p.type === "image" && ImageContainer}
+  ${(p) => p.type === "shape" && ShapeContainer}
 
   border: ${(p) => (p.isActive ? "1px solid #8b8bea" : "none")};
 
   ${(p) =>
     p.dubbleActive &&
-    `
+    css`
       border: 1px solid #e5e5ff;
       background: rgba(0, 0, 0, 0.05);
       cursor: text;
@@ -118,5 +124,5 @@ export const Wrapper = styled.div`
       & .react-resizable-handle {
         display: block;
       }
-  `}
+    `}
 `;

@@ -10,7 +10,14 @@ import {
   handleChangeTextContent,
 } from "../../model";
 import { WithDraggable, WithResizable } from "./index";
-import { Button, Shape, Image, Wrapper, ComputedStyles, Text } from "./styled";
+import {
+  Button,
+  Shape,
+  Image,
+  ElementWrapper,
+  ComputedStyles,
+  Text,
+} from "./styled";
 
 const ElementItem = ({ type, content, id, isDubbleClick }) => {
   if (type === "shape") {
@@ -92,6 +99,14 @@ export const ElementsTree = ({ progress }) => {
     const isActive = activeElement?.id === id;
     const isDubbleClick = dubleClickElementId === id;
 
+    const position =
+      style.width && style.height
+        ? {
+            width: style.width + "px",
+            height: style.height + "px",
+          }
+        : {};
+
     return (
       <WithDraggable
         key={id}
@@ -108,30 +123,38 @@ export const ElementsTree = ({ progress }) => {
           content={content}
         >
           {(ref) => (
-            <Wrapper
+            <ElementWrapper
               type={type}
               className={`${type}-wrapper`}
               isActive={isActive}
               dubbleActive={isDubbleClick}
               ref={ref}
-              onMouseDown={() => setActiveElement(element.id)}
-              onDoubleClick={() => doubleClickElement(element.id)}
+              onClick={() => setActiveElement(element.id)}
+              onDoubleClick={(e) => {
+                const article = e.currentTarget?.querySelector("article");
+
+                setTimeout(() => {
+                  article?.focus();
+                });
+
+                doubleClickElement(element.id);
+              }}
               data-component-id={id}
-              style={
-                style.width && style.height
-                  ? {
-                      width: style.width + "px",
-                      height: style.height + "px",
-                    }
-                  : {}
-              }
+              style={position}
             >
               <>
-                {isActive && (
-                  <ComputedStyles>{`${Math.round(style.width)} x ${Math.round(
-                    style.height
-                  )}`}</ComputedStyles>
-                )}
+                <>
+                  {isActive && (
+                    <ComputedStyles isActive>{`${Math.round(
+                      style.x
+                    )} x ${Math.round(style.y)}`}</ComputedStyles>
+                  )}
+                  {isDubbleClick && (
+                    <ComputedStyles>{`${Math.round(style.width)} x ${Math.round(
+                      style.height
+                    )}`}</ComputedStyles>
+                  )}
+                </>
 
                 <ElementItem
                   type={type}
@@ -140,7 +163,7 @@ export const ElementsTree = ({ progress }) => {
                   isDubbleClick={isDubbleClick}
                 />
               </>
-            </Wrapper>
+            </ElementWrapper>
           )}
         </WithResizable>
       </WithDraggable>
