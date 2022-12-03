@@ -1,15 +1,20 @@
-import { createEvent, createStore } from "effector";
+import { createEvent, createStore, restore } from "effector";
 import { nanoid } from "nanoid";
 
 const DEFAULT_ATTRIBUTES = {
   style: { width: 0, height: 0, x: 0, y: 0 },
   data: {},
+  disabled: false,
 };
 
-const COMPONENT_TYPES = {
+export const COMPONENT_TYPES = {
   button: {
     type: "button",
     content: "Hello !",
+  },
+  shape: {
+    type: "shape",
+    content: "",
   },
   text: {
     type: "text",
@@ -40,15 +45,23 @@ const tree = [
   },
 ];
 
+// двойной клик по активному елементу
 export const doubleClickElement = createEvent();
 
+// выбор активного елемента
 export const setActiveElement = createEvent();
 
-export const addComponentToTree = createEvent();
-export const removeComponentFromTree = createEvent();
+// базовый действия с елементами
+export const addElementToTree = createEvent();
+export const removeElementFromTree = createEvent();
+export const copyTreeElement = createEvent();
+export const disabledElement = createEvent();
 
+// изменение позиции и ширины елемента
 export const handleChangeElementPosition = createEvent();
 export const handleChangeResize = createEvent();
+
+// изменение текстового контента елемента
 export const handleChangeTextContent = createEvent();
 
 export const $componentsTree = createStore(tree)
@@ -102,23 +115,46 @@ export const $componentsTree = createStore(tree)
       return element;
     })
   )
-  .on(addComponentToTree, (tree, type) => {
+  .on(addElementToTree, (tree, type) => {
     const id = nanoid();
 
     const element = COMPONENT_TYPES[type];
 
     return [...tree, { ...element, attributes: DEFAULT_ATTRIBUTES, id }];
   })
-  .on(removeComponentFromTree, (tree, id) => {
+  .on(removeElementFromTree, (tree, { id }) => {
     return tree.filter((element) => element.id !== id);
+  })
+  .on(copyTreeElement, (tree, element) => {
+    const copyElement = {
+      ...element,
+      id: nanoid(),
+      attributes: {
+        ...element.attributes,
+        style: {
+          ...element.attributes.style,
+          y: element.attributes.style.y + 100,
+        },
+      },
+    };
+
+    return [...tree, copyElement];
+  })
+  .on(disabledElement, (tree, { id }) => {
+    return tree.map((element) => {
+      if (element.id === id) {
+        return {
+          ...element,
+          disabled: !element.disabled,
+        };
+      }
+
+      return element;
+    });
   });
 
-export const $activeElement = createStore(null).on(
-  setActiveElement,
-  (_, element) => element
+export const $activeElement = restore(setActiveElement, null).reset(
+  removeElementFromTree
 );
 
-export const $dubleClickElementId = createStore(null).on(
-  doubleClickElement,
-  (_, id) => id
-);
+export const $dubleClickElementId = restore(doubleClickElement, null);

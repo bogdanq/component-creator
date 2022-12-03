@@ -5,13 +5,15 @@ const MIN_SCALE = 0.5;
 const MAX_SCALE = 1.98;
 const PERSENT_STEP = 100;
 
+// стили дают паддинг зум обертки
 const createWrapperStyles = (wrapperRef, scale) => {
-  const padding = `calc(250px * ${scale})`;
+  const padding = `calc(120px * ${scale} * 3.5)`;
 
   wrapperRef.current.style.paddingLeft = padding;
   wrapperRef.current.style.paddingTop = padding;
 };
 
+// стили дают стиль scale для контента (нутри зума)
 const createContentStyles = (contentRef, scale) => {
   contentRef.current.style.transform = `scale(${scale})`;
 };
