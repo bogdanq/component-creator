@@ -1,0 +1,44 @@
+.selectTop::after {
+  position: absolute;
+  z-index: 9999;
+  content: "";
+  top: -15px;
+  left: 0;
+  right: 0;
+  height: 30px;
+  background-color: #329d9d;
+}
+.selectBottom::after {
+  position: absolute;
+  z-index: 9999;
+  content: "";
+  bottom: -15px;
+  left: 0;
+  right: 0;
+  height: 30px;
+  background-color: #329d9d;
+}
+.selectTopDisabled::after {
+  position: absolute;
+  z-index: 9999;
+  content: "";
+  top: -15px;
+  left: 0;
+  right: 0;
+  height: 30px;
+  background-color: #ffa39e;
+}
+.selectBottomDisabled::after {
+  position: absolute;
+  z-index: 9999;
+  content: "";
+  bottom: -15px;
+  left: 0;
+  right: 0;
+  height: 30px;
+  background-color: #ffa39e;
+}
+
+.react-flow__attribution {
+  display: none;
+}

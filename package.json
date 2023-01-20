@@ -1,36 +1,43 @@
 {
-  "name": "component-creator",
+  "name": "creator",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://bogdanq.github.io/component-creator",
-  "main": "index.html",
   "dependencies": {
-    "@chakra-ui/icons": "^2.0.13",
-    "@chakra-ui/react": "^2.4.1",
-    "@emotion/react": "^11.10.5",
+    "@chakra-ui/icons": "^2.0.17",
+    "@chakra-ui/react": "^2.4.9",
     "@emotion/styled": "^11.10.5",
+    "@monaco-editor/react": "^4.4.6",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
-    "classnames": "^2.3.2",
-    "effector": "^22.4.0",
-    "effector-react": "^22.3.4",
-    "framer-motion": "^7.6.12",
+    "@types/jest": "^27.5.2",
+    "@types/node": "^16.18.11",
+    "@types/react": "^18.0.27",
+    "@types/react-dom": "^18.0.10",
+    "effector": "^22.5.0",
+    "effector-react": "^22.4.0",
+    "lodash.merge": "^4.6.2",
     "nanoid": "^3.3.4",
+    "patronum": "^1.14.1",
     "react": "^18.2.0",
     "react-contenteditable": "^3.3.6",
+    "react-contexify": "^6.0.0",
+    "react-css-nocode-editor": "^1.0.13",
     "react-dom": "^18.2.0",
     "react-draggable": "^4.4.5",
     "react-resizable": "^3.0.4",
+    "react-router-dom": "^6.7.0",
     "react-scripts": "5.0.1",
+    "react-tooltip": "^5.5.2",
+    "reactflow": "^11.4.2",
+    "typescript": "^4.9.4",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "deploy": "gh-pages -d build"
+    "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": [
@@ -51,6 +58,7 @@
     ]
   },
   "devDependencies": {
-    "gh-pages": "^4.0.0"
+    "@types/lodash.merge": "^4.6.7",
+    "@types/react-resizable": "^3.0.3"
   }
 }
