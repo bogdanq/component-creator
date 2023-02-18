@@ -1,18 +1,18 @@
 import { Text } from '@chakra-ui/react'
 import { combine } from 'effector'
 import { useStore } from 'effector-react'
-import { $activeElement, $contentAreaWidth, $settings } from '../models'
+import { $activeElement, $settings, $componentsTree } from '../models'
 import { BoxPanelItems } from './box-items'
 import { BoxWrapper, BoxHeader } from './styled'
 
 const $state = combine({
   settings: $settings,
   activeElement: $activeElement,
-  contentAreaWidth: $contentAreaWidth,
+  tree: $componentsTree,
 })
 
 export const RightSideBox = () => {
-  const { activeElement, contentAreaWidth, settings } = useStore($state)
+  const { activeElement, settings, tree } = useStore($state)
 
   if (!settings) {
     return null
@@ -27,7 +27,7 @@ export const RightSideBox = () => {
       </BoxHeader>
 
       <BoxPanelItems
-        contentAreaWidth={contentAreaWidth}
+        contentAreaWidth={tree.area.width}
         activeElement={activeElement}
       />
     </BoxWrapper>

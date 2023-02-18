@@ -23,7 +23,8 @@ export const Button = styled(ContentEditable)`
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 2px 10px;
+  padding: 4px 10px;
+  align-items: center;
 `
 
 export const Image = styled.div`
@@ -37,17 +38,28 @@ export const Image = styled.div`
 `
 
 export const Shape = styled.div`
-  background-color: beige !important;
+  background-color: beige;
   width: 100%;
   height: 100%;
+`
+
+export const Link = styled(ContentEditable)`
+  width: 100%;
+  text-decoration: none;
+  cursor: pointer;
+  min-height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `
 
 export const Text = styled(ContentEditable)`
   outline: none;
   overflow-wrap: anywhere;
+  /* height: 100%; */
 `
 
-const TextWrapper = css`
+export const TextWrapper = css`
   position: absolute !important;
   text-align: left;
   font-size: 20px;
@@ -58,7 +70,7 @@ const TextWrapper = css`
   border: 1px solid transparent;
 `
 
-const ButtonContainer = css`
+export const ButtonContainer = css`
   position: absolute !important;
   text-align: center;
   font-size: 14px;
@@ -67,21 +79,31 @@ const ButtonContainer = css`
   font-weight: 600;
   letter-spacing: 0px;
   width: 150px;
-  height: 40px;
   border: 1px solid transparent;
 `
 
-const ImageContainer = css`
+export const ImageContainer = css`
   width: 200px;
   height: 200px;
   position: absolute !important;
   display: block;
 `
 
-const ShapeContainer = css`
+export const ShapeContainer = css`
   width: 100px;
   height: 100px;
   position: absolute !important;
+`
+
+export const LinkWrapper = css`
+  width: 90px;
+  position: absolute !important;
+  text-align: left;
+  font-size: 20px;
+  line-height: 31px;
+  font-weight: 400;
+  letter-spacing: 0px;
+  border: 1px solid transparent;
 `
 
 export const ElementWrapper = styled.div<{
@@ -93,6 +115,7 @@ export const ElementWrapper = styled.div<{
   ${(p) => p.type === 'button' && ButtonContainer}
   ${(p) => p.type === 'image' && ImageContainer}
   ${(p) => p.type === 'shape' && ShapeContainer}
+  ${(p) => p.type === 'link' && LinkWrapper}
 
   border: ${(p) =>
     p.isActive ? '1px solid #8b8bea' : '1px solid transparent'};
@@ -104,8 +127,8 @@ export const ElementWrapper = styled.div<{
       background: rgba(0, 0, 0, 0.05);
       cursor: text;
 
-      & .react-resizable-handle {
-        display: block;
+      & ~ .react-resizable-handle-se {
+        display: block !important;
       }
     `}
 `

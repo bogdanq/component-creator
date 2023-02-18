@@ -3,14 +3,14 @@ import {
   removeElementFromTree,
   copyTreeElement,
   disabledElement,
-  Element,
+  ElementTypes,
 } from '../../../../models'
 import { PanelItem } from './styled'
 
 export const ElementsSettingsBlock = ({
   activeElement,
 }: {
-  activeElement: Element
+  activeElement: ElementTypes
 }) => {
   const elementActions = [
     { title: 'Delete', action: () => removeElementFromTree(activeElement) },

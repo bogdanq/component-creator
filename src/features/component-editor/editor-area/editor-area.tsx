@@ -1,4 +1,3 @@
-import { useStore } from 'effector-react'
 import { useMemo } from 'react'
 import ReactFlow, {
   useNodesState,
@@ -6,7 +5,6 @@ import ReactFlow, {
   Controls,
   Background,
 } from 'reactflow'
-import { $contentAreaWidth } from '../models'
 import { WithContentResizeble } from './content-resizeble-wrapper'
 import { ElementsTree } from './elements-workspace'
 
@@ -25,18 +23,17 @@ const initialNodes = [
 // рабочая область с компонентами
 export const EditorArea = () => {
   const [nodes] = useNodesState(initialNodes)
-  const contentAreaWidth = useStore($contentAreaWidth)
 
   const nodeTypes = useMemo(() => {
     return {
       // область с елементами
       selectorNode: () => (
-        <WithContentResizeble contentAreaWidth={contentAreaWidth}>
+        <WithContentResizeble>
           <ElementsTree />
         </WithContentResizeble>
       ),
     }
-  }, [contentAreaWidth])
+  }, [])
 
   return (
     <>

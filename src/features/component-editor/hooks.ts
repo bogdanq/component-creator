@@ -1,11 +1,11 @@
-import { DependencyList, useMemo } from "react";
-import { getAreaZoom } from "./utils";
+import { useStore } from 'reactflow'
 
-export const useZoom = (deps?: DependencyList) => {
-  const zoom = useMemo(() => {
-    return getAreaZoom();
-    // eslint-disable-next-line
-  }, [deps]);
+export const useZoom = () => {
+  const zoom = useStore((s) => {
+    const zoom = s.transform[2]
 
-  return zoom;
-};
+    return zoom
+  })
+
+  return zoom
+}

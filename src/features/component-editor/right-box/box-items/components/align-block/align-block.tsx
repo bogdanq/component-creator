@@ -1,7 +1,9 @@
 import { Flex, Tooltip } from "@chakra-ui/react";
 import {
   AlignBottomIcon,
+  AlignCenterIcon,
   AlignLeftIcon,
+  AlignMiddleIcon,
   AlignRightIcon,
   AlignTopIcon,
 } from "../../../../../../assets/icons";
@@ -9,8 +11,7 @@ import { useStore } from "effector-react";
 import {
   $activeElement,
   handleChangeElementPosition,
-  $contentAreaWidth,
-  $contentAreaHeight,
+  $componentsTree,
 } from "../../../../models";
 import {
   getAreaHeightFromAreaWidth,
@@ -21,22 +22,19 @@ import { combine } from "effector";
 
 const $state = combine({
   activeElement: $activeElement,
-  contentAreaWidth: $contentAreaWidth,
-  contentAreaHeight: $contentAreaHeight,
+  tree: $componentsTree,
 });
 
 export const AlignBlock = () => {
-  const { activeElement, contentAreaHeight, contentAreaWidth } =
-    useStore($state);
+  const { activeElement, tree } = useStore($state);
 
   if (!activeElement) {
     return null;
   }
 
-  const { style } = getStyleFromAreaWidth(
-    activeElement.attributes,
-    contentAreaWidth
-  );
+  const { width, height } = tree.area;
+
+  const { style } = getStyleFromAreaWidth(activeElement.attributes, width);
 
   const handleChangePosition = (position: { x?: number; y?: number }) => {
     handleChangeElementPosition({
@@ -54,11 +52,22 @@ export const AlignBlock = () => {
               <AlignBottomIcon
                 onClick={() =>
                   handleChangePosition({
+                    y: getAreaHeightFromAreaWidth(height, width) - style.height,
+                  })
+                }
+              />
+            </div>
+          </Tooltip>
+
+          <Tooltip label="to middle">
+            <div>
+              <AlignMiddleIcon
+                onClick={() =>
+                  handleChangePosition({
                     y:
-                      getAreaHeightFromAreaWidth(
-                        contentAreaHeight,
-                        contentAreaWidth
-                      ) - style.height,
+                      (getAreaHeightFromAreaWidth(height, width) -
+                        style.height) /
+                      2,
                   })
                 }
               />
@@ -71,19 +80,29 @@ export const AlignBlock = () => {
             </div>
           </Tooltip>
         </Flex>
-        <Flex w="30%" justifyContent="space-between">
+        <Flex w="30%" justifyContent="space-between" alignItems="center">
           <Tooltip label="to left">
             <div>
               <AlignLeftIcon onClick={() => handleChangePosition({ x: 0 })} />
             </div>
           </Tooltip>
 
+          <Tooltip label="to center">
+            <div>
+              <AlignCenterIcon
+                onClick={() =>
+                  handleChangePosition({
+                    x: (width - style.width) / 2,
+                  })
+                }
+              />
+            </div>
+          </Tooltip>
+
           <Tooltip label="to right">
             <div>
               <AlignRightIcon
-                onClick={() =>
-                  handleChangePosition({ x: contentAreaWidth - style.width })
-                }
+                onClick={() => handleChangePosition({ x: width - style.width })}
               />
             </div>
           </Tooltip>

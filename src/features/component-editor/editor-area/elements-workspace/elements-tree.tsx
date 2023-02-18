@@ -1,7 +1,8 @@
-import { combine } from 'effector'
-import { useStore } from 'effector-react'
-import { useEffect } from 'react'
-import { ContentEditableEvent } from 'react-contenteditable'
+import { combine } from "effector";
+import { useStore } from "effector-react";
+import { useEffect } from "react";
+import { ContentEditableEvent } from "react-contenteditable";
+import { usePaste } from "../../../../use-paste";
 import {
   $componentsTree,
   $dubleClickElementId,
@@ -9,11 +10,11 @@ import {
   doubleClickElement,
   setActiveElement,
   handleChangeTextContent,
-  Elements,
-  $contentAreaWidth,
-} from '../../models'
-import { getStyleFromAreaWidth } from '../../utils'
-import { WithDraggable, WithResizable } from './index'
+  ElementTypes,
+} from "../../models";
+import { getStyleFromStringFx } from "../../models/css-editor";
+import { getStyleFromAreaWidth } from "../../utils";
+import { WithDraggable, WithResizable } from "./index";
 import {
   Button,
   Shape,
@@ -21,125 +22,151 @@ import {
   ElementWrapper,
   ComputedStyles,
   Text,
-} from './styled'
+  Link,
+} from "./styled";
 
 // TODO тут список всех доступных узлов, вынести по отдельности
 const ElementItem = ({
-  type,
-  content,
-  id,
   isDubbleClick,
+  style,
+  element,
 }: {
-  type: Elements
-  content: string
-  id: string
-  isDubbleClick: boolean
+  isDubbleClick: boolean;
+  style: React.CSSProperties;
+  element: ElementTypes;
 }) => {
-  if (type === 'shape') {
+  const { type, content, id, meta } = element;
+
+  if (type === "shape") {
     return (
       <Shape
         className="shape content-area"
         style={{
-          background: `url(${content}) 0% 0% / 100% 100% no-repeat`,
+          background: meta?.src
+            ? `url(${meta.src}) 0% 0% / 100% 100% no-repeat`
+            : "",
+          ...style,
         }}
       />
-    )
+    );
   }
 
-  if (type === 'image') {
+  if (type === "image") {
     return (
       <Image
         className="image content-area"
         style={{
-          background: `url(${content}) 0% 0% / 100% 100% no-repeat`,
+          background: meta?.src
+            ? `url(${meta.src}) 0% 0% / 100% 100% no-repeat`
+            : "",
+          ...style,
         }}
       />
-    )
+    );
   }
 
-  if (type === 'button') {
+  if (type === "button") {
     return (
       <Button
         className="button content-area"
         disabled={!isDubbleClick}
         html={content}
         onChange={(e: ContentEditableEvent) => {
-          handleChangeTextContent({ text: e.target.value, id })
+          handleChangeTextContent({ text: e.target.value, id });
         }}
         tagName="article"
+        style={style}
       />
-    )
+    );
   }
 
-  if (type === 'text') {
+  if (type === "text") {
     return (
       <Text
         className="text content-area"
         disabled={!isDubbleClick}
         html={content}
         onChange={(e: ContentEditableEvent) => {
-          handleChangeTextContent({ text: e.target?.value, id })
+          handleChangeTextContent({ text: e.target?.value, id });
         }}
         tagName="article"
+        style={style}
       />
-    )
+    );
   }
 
-  return null
-}
+  if (type === "link") {
+    return (
+      <Link
+        disabled={!isDubbleClick}
+        onChange={(e: ContentEditableEvent) => {
+          handleChangeTextContent({ text: e.target?.value, id });
+        }}
+        className="link content-area"
+        html={content}
+        tagName="article"
+        style={{
+          background: meta?.src
+            ? `url(${meta.src}) 0% 0% / 100% 100% no-repeat`
+            : "",
+          ...style,
+        }}
+      />
+    );
+  }
+
+  return null;
+};
 
 const $state = combine({
   tree: $componentsTree,
   activeElement: $activeElement,
   dubleClickElementId: $dubleClickElementId,
-  contentAreaWidth: $contentAreaWidth,
-})
+});
 
 export function ElementsTree() {
-  const { tree, activeElement, dubleClickElementId, contentAreaWidth } =
-    useStore($state)
+  const { tree, activeElement, dubleClickElementId } = useStore($state);
 
   useEffect(() => {
     const listener = (e: MouseEvent) => {
       // @ts-ignore
-      const id = e?.target?.closest('[data-component-id]')
+      const id = e?.target?.closest("[data-component-id]");
       // @ts-ignore
-      const isSettingBox = !!e?.target?.closest('.setting-box')
+      const isSettingBox = !!e?.target?.closest(".setting-box");
 
       if (!id && !isSettingBox) {
-        setActiveElement(null)
+        setActiveElement(null);
       }
-    }
+    };
 
-    window.addEventListener('click', listener)
+    window.addEventListener("click", listener);
 
-    return () => window.removeEventListener('click', listener)
-  }, [])
+    return () => window.removeEventListener("click", listener);
+  }, []);
 
   useEffect(() => {
-    doubleClickElement(null)
-  }, [activeElement?.id])
+    doubleClickElement(null);
+  }, [activeElement?.id]);
+
+  usePaste();
 
   return (
     <>
       {tree.elements.map((element) => {
-        const { type, id, attributes, disabled } = element
+        const { type, id, attributes, disabled, content } = element;
 
-        const { style, content } = getStyleFromAreaWidth(
-          attributes,
-          contentAreaWidth,
-        )
+        const { style } = getStyleFromAreaWidth(attributes, tree.area.width);
 
-        const isActive = activeElement?.id === id
-        const isDubbleClick = dubleClickElementId === id
+        const isActive = activeElement?.id === id;
+        const isDubbleClick = dubleClickElementId === id;
 
-        const position =
+        const cs =
           style.width && style.height
             ? {
-                width: style.width + 'px',
-                height: style.height + 'px',
+                width: style.width + "px",
+                height: style.height + "px",
               }
-            : {}
+            : {};
 
         return (
           <WithDraggable
@@ -154,46 +181,44 @@ export function ElementsTree() {
               disabled={disabled}
               id={id}
               style={style}
-              content={content}
+              content={content || ""}
             >
               {(ref) => (
                 <ElementWrapper
                   type={type}
-                  className={`${type}-wrapper`}
                   isActive={isActive}
                   dubbleActive={isDubbleClick}
                   ref={ref}
                   onClick={() => setActiveElement(element.id)}
                   onDoubleClick={(e) => {
-                    const article = e.currentTarget?.querySelector('article')
+                    const article = e.currentTarget?.querySelector("article");
 
                     setTimeout(() => {
-                      article?.focus()
-                    })
+                      article?.focus();
+                    });
 
-                    doubleClickElement(element.id)
+                    doubleClickElement(element.id);
                   }}
                   data-component-id={id}
-                  style={position}
+                  style={cs}
                 >
                   <>
                     <>
                       {isActive && (
                         <ComputedStyles isActive>{`${Math.round(
-                          style.x,
+                          style.x
                         )} x ${Math.round(style.y)}`}</ComputedStyles>
                       )}
                       {isDubbleClick && (
                         <ComputedStyles>{`${Math.round(
-                          style.width,
+                          style.width
                         )} x ${Math.round(style.height)}`}</ComputedStyles>
                       )}
                     </>
 
                     <ElementItem
-                      type={type}
-                      content={content}
-                      id={id}
+                      style={getStyleFromStringFx(style.styleString)}
+                      element={element}
                       isDubbleClick={isDubbleClick}
                     />
                   </>
@@ -201,8 +226,8 @@ export function ElementsTree() {
               )}
             </WithResizable>
           </WithDraggable>
-        )
+        );
       })}
     </>
-  )
+  );
 }

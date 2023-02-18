@@ -7,7 +7,12 @@ import {
   NumberIncrementStepper,
   NumberDecrementStepper,
 } from '@chakra-ui/react'
-import { handleChangeStyle, Element, Dimensions } from '../../../../models'
+import {
+  handleChangeStyle,
+  ElementTypes,
+  Dimensions,
+  handleChangeElementPosition,
+} from '../../../../models'
 import { getStyleFromAreaWidth } from '../../../../utils'
 import { PanelItem } from './styled'
 
@@ -40,7 +45,7 @@ export const ElementsComputedStylesBlock = ({
   activeElement,
   contentAreaWidth,
 }: {
-  activeElement: Element
+  activeElement: ElementTypes
   contentAreaWidth: Dimensions
 }) => {
   const { style } = getStyleFromAreaWidth(
@@ -57,9 +62,12 @@ export const ElementsComputedStylesBlock = ({
           </Text>
           <NumberField
             onChange={(value) =>
-              handleChangeStyle({ value, name: 'x', id: activeElement.id })
+              handleChangeElementPosition({
+                position: { x: value, y: style.y },
+                id: activeElement.id,
+              })
             }
-            value={style.x}
+            value={Math.round(style.x)}
           />
         </Flex>
 
@@ -69,9 +77,12 @@ export const ElementsComputedStylesBlock = ({
           </Text>
           <NumberField
             onChange={(value) =>
-              handleChangeStyle({ value, name: 'y', id: activeElement.id })
+              handleChangeElementPosition({
+                position: { x: style.x, y: value },
+                id: activeElement.id,
+              })
             }
-            value={style.y}
+            value={Math.round(style.y)}
           />
         </Flex>
       </Flex>
@@ -84,7 +95,7 @@ export const ElementsComputedStylesBlock = ({
             onChange={(value) =>
               handleChangeStyle({ value, name: 'width', id: activeElement.id })
             }
-            value={style.width}
+            value={Math.round(style.width)}
           />
         </Flex>
 
@@ -96,7 +107,7 @@ export const ElementsComputedStylesBlock = ({
             onChange={(value) =>
               handleChangeStyle({ value, name: 'height', id: activeElement.id })
             }
-            value={style.height}
+            value={Math.round(style.height)}
           />
         </Flex>
       </Flex>

@@ -1,2 +1,2 @@
-export * from "./editor";
-export * from "./context-menu";
+export * from './editor'
+export * from './context-menu'

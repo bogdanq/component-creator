@@ -11,12 +11,11 @@ import {
   Tooltip,
   Flex,
 } from "@chakra-ui/react";
-import { addElementToTree, $componentsTree } from "../models";
-import { AddButton, MenuWrapper, Image } from "./styled";
-import { createStyleFromTree } from "../utils";
 import { useStore } from "effector-react";
+import { addElementToTree, $componentsTree, Dimensions, Tree } from "../models";
+import { AddButton, MenuWrapper, Image } from "./styled";
 
-const SIZE = [
+const SIZE: Array<{ img: string; name: string; size: Dimensions }> = [
   {
     img: "https://tilda.cc/zero/img/tn-razreshenie_1a.svg",
     size: 320,
@@ -40,22 +39,32 @@ const SIZE = [
   {
     img: "https://tilda.cc/zero/img/tn-razreshenie_5a.svg",
     size: 1200,
-    name: "1200-max",
+    name: "1200-1400",
+  },
+  {
+    img: "https://tilda.cc/zero/img/tn-razreshenie_5a.svg",
+    size: 1400,
+    name: "1400-1600",
+  },
+  {
+    img: "https://tilda.cc/zero/img/tn-razreshenie_5a.svg",
+    size: 1600,
+    name: "1600",
   },
 ];
 
 type Props = {
   handleChangeWidth: any;
-  contentWidth: number;
+  onSave: (componentsTree: Tree) => void;
 };
 
-export function Header({ handleChangeWidth, contentWidth }: Props) {
+export function Header({ handleChangeWidth, onSave }: Props) {
   const componentsTree = useStore($componentsTree);
 
   return (
     <MenuWrapper>
       <Flex w="25%" alignItems="center" justifyContent="space-between">
-        <span>LOGO</span>
+        <h1>Logo</h1>
 
         <Flex alignItems="center" justifyContent="space-between">
           <Popover placement="bottom-end">
@@ -104,6 +113,15 @@ export function Header({ handleChangeWidth, contentWidth }: Props) {
                   >
                     Shape
                   </Button>
+                  <Button
+                    onClick={() => addElementToTree("link")}
+                    colorScheme="teal"
+                    textAlign="left"
+                    variant="link"
+                    justifyContent="start"
+                  >
+                    Link
+                  </Button>
                 </Stack>
               </PopoverBody>
             </PopoverContent>
@@ -112,10 +130,10 @@ export function Header({ handleChangeWidth, contentWidth }: Props) {
       </Flex>
 
       <Flex w="65%" justifyContent="center">
-        {SIZE.map((i) => (
-          <Tooltip key={i.img} label={i.name}>
+        {SIZE.map((i, idx) => (
+          <Tooltip key={idx} label={i.name}>
             <Image
-              imageActive={i.size === contentWidth}
+              imageActive={i.size === componentsTree.area.width}
               src={i.img}
               onClick={() => handleChangeWidth(i.size)}
               alt="mobile"
@@ -127,14 +145,14 @@ export function Header({ handleChangeWidth, contentWidth }: Props) {
       <Flex w="10%">
         <Button
           onClick={() => {
-            console.log(createStyleFromTree(componentsTree));
+            onSave(componentsTree);
           }}
           background="white"
           size="sm"
           colorScheme="black"
           color="black"
         >
-          save
+          Edit
         </Button>
       </Flex>
     </MenuWrapper>
