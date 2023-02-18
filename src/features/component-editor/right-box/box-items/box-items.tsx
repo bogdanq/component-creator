@@ -48,7 +48,7 @@ export const BoxPanelItems = ({
   const button = (
     <Button
       onClick={() => {
-        inputFileRef.current?.click();
+        alert("загрузка не доступна без сервера");
       }}
       colorScheme="teal"
       w="100%"
