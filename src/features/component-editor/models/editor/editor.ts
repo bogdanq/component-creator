@@ -1,9 +1,11 @@
 import { combine, createEvent, createStore, guard, restore } from "effector";
 import { nanoid } from "nanoid";
-import { getElementsStyleFx } from "./css-editor";
-import { getStyleFromAreaWidth } from "../utils";
+// TODO такие связи в корне модели
+import { getElementsStyleFx } from "../css-editor";
+import { getStyleFromAreaWidth } from "../../utils";
 
 // @TODO модель можно будет поделить на части
+// части работы с мета, атрибутами, ареной повыносить
 export type Elements = "text" | "button" | "shape" | "image" | "link";
 export type Dimensions = 320 | 480 | 640 | 960 | 1200 | 1400 | 1600;
 export type Attribute = {
@@ -15,7 +17,6 @@ export type Attribute = {
     // пока что стили хранятся строкой
     styleString: string;
   };
-  data: {};
 };
 
 /**
@@ -29,13 +30,15 @@ export type Attribute = {
  * TODO контент у арены выделить так же в мету
  */
 export type Element = {
-  type: Exclude<Elements, "link">;
+  type: Exclude<Elements, "link" | "button">;
   id: string;
   attributes: { [key: number]: Attribute };
   disabled: boolean;
   content?: string;
   meta: {
     src?: string;
+    container: "grid" | "window";
+    fullWidth?: boolean;
   };
 };
 
@@ -45,21 +48,39 @@ export type ElementLink = {
     href: string;
     target: "_self" | "_blank";
     src?: string;
+    container: "grid" | "window";
   };
 } & Omit<Element, "type">;
 
-export type ElementTypes = Element | ElementLink;
+export type ElementButton = {
+  type: Extract<Elements, "button">;
+  meta: {
+    src?: string;
+    hover?: {
+      borderColor?: string;
+      backgroundColor?: string;
+      color?: string;
+    };
+    container: "grid" | "window";
+  };
+} & Omit<Element, "type">;
+
+export type ElementTypes = Element | ElementLink | ElementButton;
 
 export type Area = {
   width: Dimensions;
   content?: string;
   height: { [key: number]: number };
+  styles: React.CSSProperties;
 };
 
 // TODO  дерево хранит позиции елементов
 // так же стили арены - высоту, ширину, картинку
 // на беке его хранить выгоднее, чем парсить штмл
-export type Tree = { elements: (Element | ElementLink)[]; area: Area };
+export type Tree = {
+  elements: (Element | ElementLink | ElementButton)[];
+  area: Area;
+};
 
 const DEFAULT_ATTRIBUTES: {
   disabled: boolean;
@@ -70,14 +91,16 @@ const DEFAULT_ATTRIBUTES: {
   attributes: {
     1600: {
       style: { width: 0, height: 0, x: 50, y: 50, styleString: "" },
-      data: {},
     },
   },
   content: "",
 };
 
 export const COMPONENT_TYPES: {
-  [key in Elements]: Omit<Element, "id"> | Omit<ElementLink, "id">;
+  [key in Elements]:
+    | Omit<Element, "id">
+    | Omit<ElementLink, "id">
+    | Omit<ElementButton, "id">;
 } = {
   button: {
     type: "button",
@@ -91,11 +114,17 @@ export const COMPONENT_TYPES: {
           y: 50,
           styleString: "",
         },
-        data: {},
       },
     },
     content: "Hello !",
-    meta: {},
+    meta: {
+      container: "grid",
+      hover: {
+        borderColor: "",
+        backgroundColor: "",
+        color: "",
+      },
+    },
   },
   shape: {
     type: "shape",
@@ -109,11 +138,12 @@ export const COMPONENT_TYPES: {
           y: 150,
           styleString: "",
         },
-        data: {},
       },
     },
     content: "",
-    meta: {},
+    meta: {
+      container: "grid",
+    },
   },
   text: {
     type: "text",
@@ -127,10 +157,11 @@ export const COMPONENT_TYPES: {
           y: 150,
           styleString: "",
         },
-        data: {},
       },
     },
-    meta: {},
+    meta: {
+      container: "grid",
+    },
     content:
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
   },
@@ -146,12 +177,12 @@ export const COMPONENT_TYPES: {
           y: 370,
           styleString: "",
         },
-        data: {},
       },
     },
     content: "",
     meta: {
       src: "https://minio.olimp.dev/landing-constructor/30510d56-6076-42dc-bbf9-55fccb390ac7.png",
+      container: "grid",
     },
   },
   link: {
@@ -166,13 +197,13 @@ export const COMPONENT_TYPES: {
           y: 50,
           styleString: "",
         },
-        data: {},
       },
     },
     meta: {
       href: "https://www.olimp.bet/promo",
       target: "_blank",
       src: "",
+      container: "grid",
     },
     content: "Test Link",
   },
@@ -182,6 +213,7 @@ const initialTree: Tree = {
   area: {
     height: { 1600: 600 },
     width: 1600,
+    styles: {},
   },
   elements: [
     {
@@ -216,13 +248,20 @@ export const handleChangeContentAreaWidth = createEvent<Dimensions>();
 // изменение высоты холста
 export const handleChangeContentAreaHeight = createEvent<number>();
 
+export const handleChangeAreaStyle = createEvent<{
+  value: string | number;
+  name: string;
+}>();
+
 // выбор активного елемента
 export const setActiveElement = createEvent<string | null>();
 
 // базовый действия с елементами
 export const addElementToTree = createEvent<Elements>();
 export const removeElementFromTree = createEvent<{ id: string }>();
-export const copyTreeElement = createEvent<Element | ElementLink>();
+export const copyTreeElement = createEvent<
+  Element | ElementLink | ElementButton
+>();
 export const disabledElement = createEvent<{ id: string }>();
 
 // изменение позиции и ширины елемента
@@ -249,6 +288,22 @@ export const handleChangeTextContent = createEvent<{
 export const handleChangeMetaDataLink = createEvent<{
   metaName: string;
   value: number | string;
+  id: string;
+}>();
+
+export const handleChangeMetaDataButton = createEvent<{
+  metaName: string;
+  value: number | string;
+  id: string;
+}>();
+// вырванивание по гриду или окну
+export const handleChangeElementContainer = createEvent<{
+  container: string;
+  id: string;
+}>();
+// вырванивание по гриду или окну
+export const handleChangeElementFullWidth = createEvent<{
+  fullWidth: boolean;
   id: string;
 }>();
 
@@ -348,6 +403,57 @@ $componentsTree
       return element;
     }),
   }))
+  .on(handleChangeMetaDataButton, (tree, { metaName, value, id }) => ({
+    ...tree,
+    elements: tree.elements.map((element) => {
+      if (element.id === id && element.type === "button") {
+        return {
+          ...element,
+          meta: {
+            ...element.meta,
+            hover: {
+              ...element.meta.hover,
+              [metaName]: value,
+            },
+          },
+        };
+      }
+
+      return element;
+    }),
+  }))
+  .on(handleChangeElementContainer, (tree, { container, id }) => ({
+    ...tree,
+    elements: tree.elements.map((element) => {
+      if (element.id === id) {
+        return {
+          ...element,
+          meta: {
+            ...element.meta,
+            container,
+          },
+        } as ElementTypes;
+      }
+
+      return element;
+    }),
+  }))
+  .on(handleChangeElementFullWidth, (tree, { fullWidth, id }) => ({
+    ...tree,
+    elements: tree.elements.map((element) => {
+      if (element.id === id) {
+        return {
+          ...element,
+          meta: {
+            ...element.meta,
+            fullWidth,
+          },
+        } as ElementTypes;
+      }
+
+      return element;
+    }),
+  }))
   .on(handleChangeElementPosition, (tree, { position, id }) => {
     const width = tree.area.width;
 
@@ -409,6 +515,16 @@ $componentsTree
       height: {
         ...tree.area.height,
         [tree.area.width]: height,
+      },
+    },
+  }))
+  .on(handleChangeAreaStyle, (tree, { name, value }) => ({
+    ...tree,
+    area: {
+      ...tree.area,
+      styles: {
+        ...tree.area.styles,
+        [name]: value,
       },
     },
   }))

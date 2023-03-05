@@ -1,31 +1,34 @@
 import { useCallback, useLayoutEffect, useRef } from "react";
 import { Button, Stack } from "@chakra-ui/react";
 import { CSSBuilder } from "react-css-nocode-editor";
-import { Dimensions, ElementTypes, handleChangeStyle } from "../../models";
+import { Area, ElementTypes, handleChangeStyle } from "../../models";
 import {
   ElementsSettingsBlock,
   ElementsComputedStylesBlock,
   AlignBlock,
   LinkBlock,
+  AreaComputedStylesBlock,
+  HoverBlock,
 } from "./components";
 import { getStyleFromAreaWidth } from "../../utils";
 import { getElementsStyleFx } from "../../models/css-editor";
 
 export const BoxPanelItems = ({
   activeElement,
-  contentAreaWidth,
+  area,
 }: {
   activeElement: ElementTypes | null;
-  contentAreaWidth: Dimensions;
+  area: Area;
 }) => {
   const inputFileRef = useRef<
     HTMLInputElement & { target: EventTarget & HTMLInputElement }
   >(null);
 
   useLayoutEffect(() => {
-    if (activeElement) {
+    if (activeElement?.id) {
       getElementsStyleFx(activeElement.id);
     }
+
     // eslint-disable-next-line
   }, [activeElement?.id]);
 
@@ -48,7 +51,7 @@ export const BoxPanelItems = ({
   const button = (
     <Button
       onClick={() => {
-        alert("загрузка не доступна без сервера");
+        inputFileRef.current?.click();
       }}
       colorScheme="teal"
       w="100%"
@@ -59,45 +62,64 @@ export const BoxPanelItems = ({
   );
 
   if (!activeElement) {
-    return <>{button}</>;
+    return (
+      <>
+        <AreaComputedStylesBlock
+          contentAreaWidth={area.width}
+          contentAreaHeight={area.height}
+        />
+        {button}
+      </>
+    );
   }
 
-  const { style } = getStyleFromAreaWidth(
-    activeElement.attributes,
-    contentAreaWidth
-  );
+  const { style } = getStyleFromAreaWidth(activeElement.attributes, area.width);
 
   const defaultContent = (
     <>
       <AlignBlock />
       <ElementsComputedStylesBlock
-        contentAreaWidth={contentAreaWidth}
+        contentAreaWidth={area.width}
         activeElement={activeElement}
       />
       <ElementsSettingsBlock activeElement={activeElement} />
-
-      <Stack mt="10px">
-        <CSSBuilder
-          key={activeElement.id}
-          style={style.styleString}
-          onChange={changeStyles}
-          reactive
-        />
-      </Stack>
     </>
+  );
+
+  const cssBuilder = (
+    <Stack mt="10px">
+      <CSSBuilder
+        key={activeElement.id}
+        style={style.styleString}
+        onChange={changeStyles}
+        reactive
+      />
+    </Stack>
   );
 
   switch (activeElement?.type) {
     case "text":
-      return <>{defaultContent}</>;
+      return (
+        <>
+          {defaultContent}
+          {cssBuilder}
+        </>
+      );
     case "button":
-      return <>{defaultContent}</>;
+      return (
+        <>
+          {defaultContent}
+          <HoverBlock activeElement={activeElement} />
+          {cssBuilder}
+        </>
+      );
     case "link":
       return (
         <>
           {button}
           <LinkBlock activeElement={activeElement} />
           {defaultContent}
+          {cssBuilder}
         </>
       );
     case "image":
@@ -105,6 +127,7 @@ export const BoxPanelItems = ({
         <>
           {button}
           {defaultContent}
+          {cssBuilder}
         </>
       );
     case "shape":
@@ -112,6 +135,7 @@ export const BoxPanelItems = ({
         <>
           {button}
           {defaultContent}
+          {cssBuilder}
         </>
       );
     default:

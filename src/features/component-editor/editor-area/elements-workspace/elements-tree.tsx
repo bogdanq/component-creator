@@ -2,7 +2,6 @@ import { combine } from "effector";
 import { useStore } from "effector-react";
 import { useEffect } from "react";
 import { ContentEditableEvent } from "react-contenteditable";
-import { usePaste } from "../../../../use-paste";
 import {
   $componentsTree,
   $dubleClickElementId,
@@ -12,7 +11,11 @@ import {
   handleChangeTextContent,
   ElementTypes,
 } from "../../models";
-import { getStyleFromStringFx } from "../../models/css-editor";
+import { usePaste } from "../../../common";
+import {
+  getStyleFromStringFx,
+  getStyleFromObject,
+} from "../../models/css-editor";
 import { getStyleFromAreaWidth } from "../../utils";
 import { WithDraggable, WithResizable } from "./index";
 import {
@@ -23,6 +26,7 @@ import {
   ComputedStyles,
   Text,
   Link,
+  TextRelative,
 } from "./styled";
 
 // TODO тут список всех доступных узлов, вынести по отдельности
@@ -68,6 +72,7 @@ const ElementItem = ({
   if (type === "button") {
     return (
       <Button
+        hoverStyles={getStyleFromObject(meta.hover)}
         className="button content-area"
         disabled={!isDubbleClick}
         html={content}
@@ -153,7 +158,7 @@ export function ElementsTree() {
   return (
     <>
       {tree.elements.map((element) => {
-        const { type, id, attributes, disabled, content } = element;
+        const { type, id, attributes, disabled, content, meta } = element;
 
         const { style } = getStyleFromAreaWidth(attributes, tree.area.width);
 
@@ -213,6 +218,9 @@ export function ElementsTree() {
                         <ComputedStyles>{`${Math.round(
                           style.width
                         )} x ${Math.round(style.height)}`}</ComputedStyles>
+                      )}
+                      {isActive && meta.container === "window" && (
+                        <TextRelative>window relative</TextRelative>
                       )}
                     </>
 

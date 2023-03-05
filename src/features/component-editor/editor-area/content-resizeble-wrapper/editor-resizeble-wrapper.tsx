@@ -19,7 +19,7 @@ const $state = combine({
 export const WithContentResizeble = ({ children }: Props) => {
   const { tree } = useStore($state)
 
-  const { width } = tree.area
+  const { width, styles } = tree.area
 
   const height = getAreaHeightFromAreaWidth(tree.area.height, width)
 
@@ -37,10 +37,12 @@ export const WithContentResizeble = ({ children }: Props) => {
   return (
     <Resizable height={height} width={width} onResize={onResize}>
       <ContentWrapper
+        className="content-area"
         style={{
           width: `${width}px`,
           height: height,
           backgroundImage: `url(${tree.area.content})`,
+          ...styles,
         }}
       >
         {children}

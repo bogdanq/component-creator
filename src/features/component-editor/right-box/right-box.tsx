@@ -1,9 +1,9 @@
-import { Text } from '@chakra-ui/react'
 import { combine } from 'effector'
 import { useStore } from 'effector-react'
 import { $activeElement, $settings, $componentsTree } from '../models'
+import { BlockTitle } from './block-title'
 import { BoxPanelItems } from './box-items'
-import { BoxWrapper, BoxHeader } from './styled'
+import { BoxWrapper } from './styled'
 
 const $state = combine({
   settings: $settings,
@@ -20,16 +20,9 @@ export const RightSideBox = () => {
 
   return (
     <BoxWrapper className="setting-box">
-      <BoxHeader>
-        <Text opacity="0.4" textTransform="uppercase" fontSize="sm">
-          Artboard settings
-        </Text>
-      </BoxHeader>
+      <BlockTitle>Artboard settings</BlockTitle>
 
-      <BoxPanelItems
-        contentAreaWidth={tree.area.width}
-        activeElement={activeElement}
-      />
+      <BoxPanelItems area={tree.area} activeElement={activeElement} />
     </BoxWrapper>
   )
 }

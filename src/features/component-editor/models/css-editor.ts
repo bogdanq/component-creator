@@ -55,3 +55,28 @@ export const getStyleFromStringFx = (str: string): React.CSSProperties => {
 
   return styles
 }
+
+// TODO  вынести
+// наоборот получить из обьекта строку
+// нужно перебить инлайн стили (в режиме разработки)
+export const getStyleFromObject = (styles?: {
+  [key: string]: string | number
+}): string => {
+  let result = ''
+
+  if (!styles) {
+    return ''
+  }
+
+  Object.entries(styles).forEach(([key, value]) => {
+    const styleName = key.replace(/[A-Z]/g, function (char) {
+      return `-${char.toLowerCase()}`
+    })
+
+    if (value) {
+      result += `${styleName}:${value} !important;`
+    }
+  })
+
+  return result
+}

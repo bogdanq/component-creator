@@ -12,12 +12,12 @@ export const Wrapper = styled.div<{ type: Elements; isActive: boolean }>`
   ${({ type }) =>
     type === 'button' &&
     css`
-      z-index: 5;
+      z-index: 6;
     `}
   ${({ type }) =>
     type === 'text' &&
     css`
-      z-index: 4;
+      z-index: 5;
     `}
   ${({ type }) =>
     type === 'image' &&
@@ -27,12 +27,12 @@ export const Wrapper = styled.div<{ type: Elements; isActive: boolean }>`
   ${({ type }) =>
     type === 'shape' &&
     css`
-      z-index: 2;
+      z-index: 4;
     `}
   ${({ type }) =>
     type === 'link' &&
     css`
-      z-index: 6;
+      z-index: 7;
     `}
 
     ${({ isActive }) =>

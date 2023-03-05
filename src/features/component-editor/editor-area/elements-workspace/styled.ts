@@ -8,7 +8,7 @@ export const ContentEditable = styled<any>(ContentEditableDefault)`
   overflow-wrap: anywhere;
 `
 
-export const Button = styled(ContentEditable)`
+export const Button = styled(ContentEditable)<{ hoverStyles?: string }>`
   color: rgb(255, 255, 255);
   background-color: rgb(0, 0, 0);
   opacity: 1;
@@ -24,7 +24,18 @@ export const Button = styled(ContentEditable)`
   flex-direction: column;
   justify-content: center;
   padding: 4px 10px;
+  transition: all 0.3s;
   align-items: center;
+
+  ${({ hoverStyles }) => {
+    if (hoverStyles) {
+      return css`
+        &:hover {
+          ${hoverStyles}
+        }
+      `
+    }
+  }}
 `
 
 export const Image = styled.div`
@@ -148,4 +159,17 @@ export const ComputedStyles = styled.span<{ isActive?: boolean }>`
   left: calc(50% - 40px);
   line-height: 20px;
   width: 80px;
+`
+
+export const TextRelative = styled.span`
+  position: absolute;
+  color: #8b8bea;
+  font-weight: normal;
+  font-size: 12px;
+  top: -22px;
+  line-height: 20px;
+  display: flex;
+  justify-content: center;
+  left: 0;
+  line-height: 20px;
 `

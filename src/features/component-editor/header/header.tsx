@@ -64,8 +64,7 @@ export function Header({ handleChangeWidth, onSave }: Props) {
   return (
     <MenuWrapper>
       <Flex w="25%" alignItems="center" justifyContent="space-between">
-        <h1>Logo</h1>
-
+        LOGO
         <Flex alignItems="center" justifyContent="space-between">
           <Popover placement="bottom-end">
             <PopoverTrigger>
@@ -152,7 +151,7 @@ export function Header({ handleChangeWidth, onSave }: Props) {
           colorScheme="black"
           color="black"
         >
-          Edit
+          Create
         </Button>
       </Flex>
     </MenuWrapper>

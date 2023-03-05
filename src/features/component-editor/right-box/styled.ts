@@ -15,9 +15,3 @@ export const BoxWrapper = styled.div`
   z-index: 110;
   padding: 0 10px;
 `
-
-export const BoxHeader = styled.div`
-  height: 40px;
-  line-height: 40px;
-  padding: 0 18px 0 20px;
-`

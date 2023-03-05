@@ -3,11 +3,6 @@ import {
   Image,
   Button,
   Shape,
-  TextWrapper,
-  ButtonContainer,
-  ImageContainer,
-  ShapeContainer,
-  LinkWrapper,
   Link,
 } from '../component-editor/editor-area/elements-workspace/styled'
 
@@ -48,48 +43,50 @@ TODO
 export const defaultComponentStyles = css`
   .button {
     ${Button.__emotion_styles}
-    justify-content: center;
-    align-items: center;
   }
   .image {
     ${Image.__emotion_styles}
+    position: absolute;
   }
   .shape {
     ${Shape.__emotion_styles}
   }
   .text {
     overflow-wrap: anywhere;
+    position: absolute;
   }
   .link {
     ${Link.__emotion_styles};
+    position: absolute;
   }
 
-  .text-wrapper {
-    ${TextWrapper.styles}
-    z-index: 4;
-    height: 0;
-  }
+  .shape-wrapper,
+  .text-wrapper,
+  .link-wrapper,
+  .image-wrapper,
   .button-wrapper {
-    ${ButtonContainer.styles}
-    z-index: 5;
-    height: 0;
+    position: absolute;
+    width: 100%;
   }
-  .image-wrapper {
-    ${ImageContainer.styles}
-    z-index: 3;
-    height: 0;
-    width: auto;
-  }
+
   .shape-wrapper {
-    ${ShapeContainer.styles}
-    z-index: 2;
-    height: 0;
+    z-index: 4;
+  }
+  .text-wrapper {
+    z-index: 5;
   }
   .link-wrapper {
-    ${LinkWrapper.styles}
+    z-index: 7;
+  }
+  .image-wrapper {
+    z-index: 3;
+  }
+  .button-wrapper {
     z-index: 6;
-    height: 0;
-    width: auto;
+  }
+
+  .fullWidth {
+    width: 100vw !important;
   }
 `
 
