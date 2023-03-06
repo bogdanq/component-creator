@@ -487,27 +487,29 @@ $componentsTree
         }
 
         if (tree.activeElementsIds.includes(element.id) && element.id !== id) {
+          const attributes = getStyleFromAreaWidth(element.attributes, width);
+
           return {
             ...element,
             attributes: {
               ...element.attributes,
               [width]: {
-                ...element.attributes[width],
+                ...attributes,
                 style: {
-                  ...element.attributes[width]?.style,
+                  ...attributes.style,
                   x:
                     Number(startPositions?.x) > position.x
-                      ? element.attributes[width]?.style.x -
+                      ? attributes.style.x -
                         (Number(startPositions?.x) - position.x)
-                      : element.attributes[width]?.style.x +
+                      : attributes.style.x +
                         position.x -
                         Number(startPositions?.x),
 
                   y:
                     Number(startPositions?.y) > position.y
-                      ? element.attributes[width]?.style.y -
+                      ? attributes.style.y -
                         (Number(startPositions?.y) - position.y)
-                      : element.attributes[width]?.style.y +
+                      : attributes.style.y +
                         position.y -
                         Number(startPositions?.y),
                 },
@@ -636,7 +638,8 @@ $componentsTree
     const width = tree.area.width;
 
     const activeElementsIds = tree.elements.reduce<string[]>((acc, element) => {
-      const style = element.attributes[width].style;
+      const { style } = getStyleFromAreaWidth(element.attributes, width);
+
       const rightSide = style.width + style.x;
       const leftSide = style.x;
 
