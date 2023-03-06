@@ -162,7 +162,8 @@ export function ElementsTree() {
 
         const { style } = getStyleFromAreaWidth(attributes, tree.area.width);
 
-        const isActive = activeElement?.id === id;
+        const isActive =
+          activeElement?.id === id || tree.activeElementsIds.includes(id);
         const isDubbleClick = dubleClickElementId === id;
 
         const cs =

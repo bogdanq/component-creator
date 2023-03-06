@@ -80,6 +80,7 @@ export type Area = {
 export type Tree = {
   elements: (Element | ElementLink | ElementButton)[];
   area: Area;
+  activeElementsIds: string[];
 };
 
 const DEFAULT_ATTRIBUTES: {
@@ -210,6 +211,7 @@ export const COMPONENT_TYPES: {
 };
 
 const initialTree: Tree = {
+  activeElementsIds: [],
   area: {
     height: { 1600: 600 },
     width: 1600,
@@ -217,23 +219,23 @@ const initialTree: Tree = {
   },
   elements: [
     {
-      id: nanoid(),
+      id: "1",
       ...COMPONENT_TYPES.button,
     },
     {
-      id: nanoid(),
+      id: "2",
       ...COMPONENT_TYPES.text,
     },
     {
-      id: nanoid(),
+      id: "3",
       ...COMPONENT_TYPES.image,
     },
     {
-      id: nanoid(),
+      id: "4",
       ...COMPONENT_TYPES.shape,
     },
     {
-      id: nanoid(),
+      id: "5",
       ...COMPONENT_TYPES.link,
     },
   ],
@@ -267,6 +269,7 @@ export const disabledElement = createEvent<{ id: string }>();
 // изменение позиции и ширины елемента
 export const handleChangeElementPosition = createEvent<{
   position: { x: number; y: number };
+  startPositions?: { x: number; y: number };
   id: string;
 }>();
 export const handleChangeElementResize = createEvent<{
@@ -305,6 +308,12 @@ export const handleChangeElementContainer = createEvent<{
 export const handleChangeElementFullWidth = createEvent<{
   fullWidth: boolean;
   id: string;
+}>();
+
+// добавить активные елементы по выборке
+export const handleAddActiveelements = createEvent<{
+  startPositions: { x: number; y: number };
+  endPositions: { x: number; y: number };
 }>();
 
 export const $dubleClickElementId = restore(doubleClickElement, null);
@@ -454,7 +463,7 @@ $componentsTree
       return element;
     }),
   }))
-  .on(handleChangeElementPosition, (tree, { position, id }) => {
+  .on(handleChangeElementPosition, (tree, { position, id, startPositions }) => {
     const width = tree.area.width;
 
     return {
@@ -471,6 +480,36 @@ $componentsTree
                   ...element.attributes[width]?.style,
                   x: position.x,
                   y: position.y,
+                },
+              },
+            },
+          };
+        }
+
+        if (tree.activeElementsIds.includes(element.id) && element.id !== id) {
+          return {
+            ...element,
+            attributes: {
+              ...element.attributes,
+              [width]: {
+                ...element.attributes[width],
+                style: {
+                  ...element.attributes[width]?.style,
+                  x:
+                    Number(startPositions?.x) > position.x
+                      ? element.attributes[width]?.style.x -
+                        (Number(startPositions?.x) - position.x)
+                      : element.attributes[width]?.style.x +
+                        position.x -
+                        Number(startPositions?.x),
+
+                  y:
+                    Number(startPositions?.y) > position.y
+                      ? element.attributes[width]?.style.y -
+                        (Number(startPositions?.y) - position.y)
+                      : element.attributes[width]?.style.y +
+                        position.y -
+                        Number(startPositions?.y),
                 },
               },
             },
@@ -592,4 +631,32 @@ $componentsTree
       ...tree.area,
       width,
     },
-  }));
+  }))
+  .on(handleAddActiveelements, (tree, { startPositions, endPositions }) => {
+    const width = tree.area.width;
+
+    const activeElementsIds = tree.elements.reduce<string[]>((acc, element) => {
+      const style = element.attributes[width].style;
+      const rightSide = style.width + style.x;
+      const leftSide = style.x;
+
+      const topSide = style.y;
+      const bottomSide = style.height + style.y;
+
+      const validX =
+        (rightSide >= startPositions.x || rightSide >= endPositions.x) &&
+        (leftSide <= endPositions.x || leftSide <= startPositions.x);
+
+      const validY =
+        (bottomSide >= startPositions.y || bottomSide >= endPositions.y) &&
+        (topSide <= endPositions.y || topSide <= startPositions.y);
+
+      if (validX && validY) {
+        acc.push(element.id);
+      }
+
+      return acc;
+    }, []);
+
+    return { ...tree, activeElementsIds };
+  });
