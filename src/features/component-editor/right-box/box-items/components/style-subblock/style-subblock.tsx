@@ -6,30 +6,26 @@ import {
   NumberInputStepper,
   NumberIncrementStepper,
   NumberDecrementStepper,
-  Select,
-  Checkbox,
-} from '@chakra-ui/react'
+} from "@chakra-ui/react";
 import {
   handleChangeStyle,
   ElementTypes,
   Dimensions,
   handleChangeElementPosition,
   handleChangeContentAreaHeight,
-  handleChangeElementContainer,
-  handleChangeElementFullWidth,
-} from '../../../../models'
+} from "../../../../models";
 import {
   getAreaHeightFromAreaWidth,
   getStyleFromAreaWidth,
-} from '../../../../utils'
-import { PanelItem } from './styled'
+} from "../../../../utils";
+import { PanelItem } from "./styled";
 
 const NumberField = ({
   onChange,
   value,
 }: {
-  onChange: (v: number) => void
-  value: number
+  onChange: (v: number) => void;
+  value: number;
 }) => {
   return (
     <NumberInput
@@ -46,20 +42,20 @@ const NumberField = ({
         <NumberDecrementStepper />
       </NumberInputStepper>
     </NumberInput>
-  )
-}
+  );
+};
 
 export const ElementsComputedStylesBlock = ({
   activeElement,
   contentAreaWidth,
 }: {
-  activeElement: ElementTypes
-  contentAreaWidth: Dimensions
+  activeElement: ElementTypes;
+  contentAreaWidth: Dimensions;
 }) => {
   const { style } = getStyleFromAreaWidth(
     activeElement.attributes,
-    contentAreaWidth,
-  )
+    contentAreaWidth
+  );
 
   return (
     <PanelItem>
@@ -101,7 +97,7 @@ export const ElementsComputedStylesBlock = ({
           </Text>
           <NumberField
             onChange={(value) =>
-              handleChangeStyle({ value, name: 'width', id: activeElement.id })
+              handleChangeStyle({ value, name: "width", id: activeElement.id })
             }
             value={Math.round(style.width)}
           />
@@ -113,65 +109,29 @@ export const ElementsComputedStylesBlock = ({
           </Text>
           <NumberField
             onChange={(value) =>
-              handleChangeStyle({ value, name: 'height', id: activeElement.id })
+              handleChangeStyle({ value, name: "height", id: activeElement.id })
             }
             value={Math.round(style.height)}
           />
         </Flex>
       </Flex>
-
-      <Flex mt="25px" justifyContent="space-between">
-        <Text fontSize="sm" opacity="0.5">
-          Container
-        </Text>
-        <Select
-          background="transparent"
-          placeholder="select target"
-          size="xs"
-          w="62%"
-          defaultValue="grid"
-          value={activeElement.meta.container}
-          onChange={(e) =>
-            handleChangeElementContainer({
-              id: activeElement.id,
-              container: e.target.value,
-            })
-          }
-        >
-          <option value="grid">Grid</option>
-          <option value="window">Window</option>
-        </Select>
-      </Flex>
-
-      <Flex mt="25px" justifyContent="space-between">
-        <Text fontSize="sm" opacity="0.5">
-          Full width
-        </Text>
-
-        <Checkbox
-          isChecked={activeElement.meta.fullWidth}
-          onChange={(e) =>
-            handleChangeElementFullWidth({
-              id: activeElement.id,
-              fullWidth: e.target.checked,
-            })
-          }
-        />
-      </Flex>
     </PanelItem>
-  )
-}
+  );
+};
 
 export const AreaComputedStylesBlock = ({
   contentAreaHeight,
   contentAreaWidth,
 }: {
   contentAreaHeight: {
-    [key: number]: number
-  }
-  contentAreaWidth: Dimensions
+    [key: number]: number;
+  };
+  contentAreaWidth: Dimensions;
 }) => {
-  const height = getAreaHeightFromAreaWidth(contentAreaHeight, contentAreaWidth)
+  const height = getAreaHeightFromAreaWidth(
+    contentAreaHeight,
+    contentAreaWidth
+  );
 
   return (
     <PanelItem>
@@ -182,12 +142,12 @@ export const AreaComputedStylesBlock = ({
           </Text>
           <NumberField
             onChange={(value) => {
-              handleChangeContentAreaHeight(value)
+              handleChangeContentAreaHeight(value);
             }}
             value={height}
           />
         </Flex>
       </Flex>
     </PanelItem>
-  )
-}
+  );
+};

@@ -1,77 +1,77 @@
-import merge from 'lodash.merge'
-import { css } from '@emotion/react'
-import ReactDOMServer from 'react-dom/server'
-import { nanoid } from 'nanoid'
-import classnames from 'classnames'
+import merge from "lodash.merge";
+import { css } from "@emotion/react";
+import ReactDOMServer from "react-dom/server";
+import { nanoid } from "nanoid";
+import classnames from "classnames";
 import {
   Attribute,
   Dimensions,
   ElementTypes,
   Tree,
   getStyleFromObject,
-} from './models'
+} from "./models";
 
-const dimensions: Dimensions[] = [320, 480, 640, 960, 1200, 1400, 1600]
+const dimensions: Dimensions[] = [320, 480, 640, 960, 1200, 1400, 1600];
 
 // составляет стили из дерева и выводит нужные
 // имитирует медиа запросы вставляя стиль инлайн
 export const getStyleFromAreaWidth = (
-  attributes: ElementTypes['attributes'],
-  width: number | string,
+  attributes: ElementTypes["attributes"],
+  width: number | string
 ): Attribute => {
   if (width !== 1600) {
-    const atr: any[] = []
-    const widthIndex = dimensions.findIndex((i) => i === width)
+    const atr: any[] = [];
+    const widthIndex = dimensions.findIndex((i) => i === width);
 
     for (let i = widthIndex; i < dimensions.length; i++) {
-      atr.unshift(attributes[dimensions[i]] ?? {})
+      atr.unshift(attributes[dimensions[i]] ?? {});
     }
 
-    return merge({}, ...atr)
+    return merge({}, ...atr);
   }
 
-  return attributes[1600]
-}
+  return attributes[1600];
+};
 
 // получить высоту холста
 // для каждого екрана она может быть разной
 export const getAreaHeightFromAreaWidth = (
   height: {
-    [key: number]: number
+    [key: number]: number;
   },
-  width: number,
+  width: number
 ) => {
   if (width !== 1600) {
-    return height[width] || height[1600]
+    return height[width] || height[1600];
   }
 
-  return height[1600]
-}
+  return height[1600];
+};
 
 // создает канвас сетку на холсте
 export const createGrid = (
   contentAreaWidth: number,
   height: number,
-  canvasId: string,
+  canvasId: string
 ) => {
-  const GRID_WIDTH = 102
+  const GRID_WIDTH = 102;
 
-  const gridCount = Math.ceil(contentAreaWidth / GRID_WIDTH)
+  const gridCount = Math.ceil(contentAreaWidth / GRID_WIDTH);
 
-  const c_canvas = document.querySelector(canvasId)
+  const c_canvas = document.querySelector(canvasId);
   // @ts-ignore
-  const context = c_canvas?.getContext('2d')
+  const context = c_canvas?.getContext("2d");
 
   if (context) {
     for (var x = 0; x <= gridCount; x++) {
-      context.moveTo(x * GRID_WIDTH, 0)
-      context.lineTo(x * GRID_WIDTH, height)
+      context.moveTo(x * GRID_WIDTH, 0);
+      context.lineTo(x * GRID_WIDTH, height);
     }
 
-    context.strokeStyle = '#cacaca'
-    context.stroke()
+    context.strokeStyle = "#cacaca";
+    context.stroke();
   }
-}
+};
 
 // создает валидный цсс код с медиа запросами на основе дерева
 // заранее есть размеры екранов
@@ -80,23 +80,23 @@ export const createGrid = (
 export const createStyleFromTree = (
   tree: Tree,
   contentAreaHeight: {
-    [key: number]: number
+    [key: number]: number;
   },
-  uniqID: string,
+  uniqID: string
 ) => {
   const styles: { [key in Dimensions]: string } = {
-    1600: '',
-    1400: '@media screen and (max-width: 1600px) {',
-    1200: '@media screen and (max-width: 1400px) {',
-    960: '@media screen and (max-width: 1200px) {',
-    640: '@media screen and (max-width: 960px) {',
-    480: '@media screen and (max-width: 640px) {',
-    320: '@media screen and (max-width: 480px) {',
-  }
+    1600: "",
+    1400: "@media screen and (max-width: 1600px) {",
+    1200: "@media screen and (max-width: 1400px) {",
+    960: "@media screen and (max-width: 1200px) {",
+    640: "@media screen and (max-width: 960px) {",
+    480: "@media screen and (max-width: 640px) {",
+    320: "@media screen and (max-width: 480px) {",
+  };
 
   // стили поведения для обертки высота и ширина
   dimensions.forEach((dimension) => {
-    const { content } = tree.area
+    const { content } = tree.area;
 
     styles[dimension] += css`
       .wrapper-element_item-content${uniqID} {
@@ -119,89 +119,89 @@ export const createStyleFromTree = (
         background-size: cover;
         overflow-x: hidden;
       }
-    `.styles
-  })
+    `.styles;
+  });
 
   tree.elements.forEach((item, idx) => {
     dimensions.forEach((dimension) => {
-      const attributeByWidth = item.attributes[dimension]
+      const attributeByWidth = item.attributes[dimension];
 
       if (!attributeByWidth) {
-        return
+        return;
       }
 
       styles[dimension] += `
         [data-component-id="${item.id}"] {${styleBuilder(attributeByWidth)}}
-      `
+      `;
 
       // создание ховер эффекта TODO вынести
-      if (item.type === 'button') {
+      if (item.type === "button") {
         styles[dimension] += `
         [data-component-id="${item.id}"]:hover {${getStyleFromObject(
-          item.meta.hover,
+          item.meta.hover
         )}}
-      `
+      `;
       }
 
       if (idx === tree.elements.length - 1 && dimension !== 1600) {
-        styles[dimension] += '}'
+        styles[dimension] += "}";
       }
-    })
-  })
+    });
+  });
 
-  return Object.values(styles).filter(Boolean).reverse().join('')
-}
+  return Object.values(styles).filter(Boolean).reverse().join("");
+};
 
 const styleBuilder = (attribute: Attribute) => {
-  const { style } = attribute
+  const { style } = attribute;
 
-  const stylesWithUnits: string[] = ['width', 'height']
-  const stylesWithoutUnits: string[] = []
+  const stylesWithUnits: string[] = ["width", "height"];
+  const stylesWithoutUnits: string[] = [];
   const transformNames: { [key: string]: string | number } = {
-    height: 'height',
+    height: "height",
     // height: 'min-height',
-  }
+  };
 
-  let styles = ''
+  let styles = "";
 
   // TODO  позиция добавляется в стили
-  if (typeof style.x === 'number' && typeof style.y === 'number') {
-    styles += `transform: translate(${style.x}px, ${style.y}px);`
+  if (typeof style.x === "number" && typeof style.y === "number") {
+    styles += `transform: translate(${style.x}px, ${style.y}px);`;
   }
 
   if (!!style.styleString) {
-    styles += `${style.styleString};`
+    styles += `${style.styleString};`;
   }
 
   Object.entries(style).forEach(([key, value]) => {
     if (stylesWithUnits.includes(key)) {
-      styles += `${transformNames[key] || key}: ${value}px;`
+      styles += `${transformNames[key] || key}: ${value}px;`;
     }
 
     if (stylesWithoutUnits.includes(key)) {
-      styles += `${key}: ${value};`
+      styles += `${key}: ${value};`;
     }
-  })
+  });
 
-  return styles
-}
+  return styles;
+};
 
 export const createHtmlFromTree = (tree: Tree) => {
   const element = tree.elements.map((element) => {
-    const { type, id, content, meta, attributes } = element
+    const { type, id, content, meta, attributes } = element;
 
-    let elementByType: React.ReactElement | null = null
+    let elementByType: React.ReactElement | null = null;
 
-    if (type === 'shape' && !meta.src) {
+    if (type === "shape" && !meta.src) {
       elementByType = (
         <div className="shape" data-component-id={id} data-img-id={id} />
-      )
+      );
     }
 
-    if ((type === 'image' || type === 'shape') && meta.src) {
+    if ((type === "image" || type === "shape") && meta.src) {
       elementByType = (
         <div
-          className={classnames('image', {
+          className={classnames("image", {
             fullWidth: meta.fullWidth,
           })}
         >
@@ -215,34 +215,34 @@ export const createHtmlFromTree = (tree: Tree) => {
             alt="img"
           />
         </div>
-      )
+      );
     }
 
-    if (type === 'button') {
+    if (type === "button") {
       elementByType = (
         <button
           className="button"
           contentEditable="true"
           data-component-id={id}
           data-text-id={id}
-          dangerouslySetInnerHTML={{ __html: content || '' }}
+          dangerouslySetInnerHTML={{ __html: content || "" }}
         />
-      )
+      );
     }
 
-    if (type === 'text') {
+    if (type === "text") {
       elementByType = (
         <article
           className="text"
           contentEditable="true"
           data-component-id={id}
           data-text-id={id}
-          dangerouslySetInnerHTML={{ __html: content || '' }}
+          dangerouslySetInnerHTML={{ __html: content || "" }}
         />
-      )
+      );
     }
 
-    if (type === 'link') {
+    if (type === "link") {
       elementByType = (
         <a
           href={meta.href}
@@ -259,22 +259,38 @@ export const createHtmlFromTree = (tree: Tree) => {
             content
           )}
         </a>
-      )
+      );
     }
 
     // получить позицию елемента на каждый екран и сохранить
     // в дата атрибут, что бы можно было брать ее как
     const positions = dimensions.reduce<{
-      [key: string]: number
+      [key: string]: number;
     }>((acc, dimension) => {
-      if (meta.container === 'window') {
-        const attrs = getStyleFromAreaWidth(attributes, dimension)
-        acc[`data-x-${dimension}`] = attrs.style.x
-        acc[`data-y-${dimension}`] = attrs.style.y
+      if (meta.container === "window") {
+        const attrs = getStyleFromAreaWidth(attributes, dimension);
+        acc[`data-x-${dimension}`] = attrs.style.x;
+        acc[`data-y-${dimension}`] = attrs.style.y;
       }
 
-      return acc
-    }, {})
+      return acc;
+    }, {});
+
+    // получить выравнивание елемента на конкретном размере екрана
+    // что бы потом на лендинге скрипт относительно значения мог тащить к нужной стороне екркна
+    const asix = dimensions.reduce<{
+      [key: string]: string;
+    }>((acc, dimension) => {
+      if (meta.container === "window") {
+        const attrs = getStyleFromAreaWidth(attributes, dimension);
+
+        acc[`data-asixx-${dimension}`] = attrs.style.asixX;
+      }
+
+      return acc;
+    }, {});
+
+    console.log("asix", asix);
 
     return (
       <div
@@ -283,23 +299,24 @@ export const createHtmlFromTree = (tree: Tree) => {
         id={`link_${id}`}
         data-window-relative={meta.container}
         {...positions}
+        {...asix}
       >
         {elementByType}
       </div>
-    )
-  })
+    );
+  });
 
-  return ReactDOMServer.renderToStaticMarkup(<>{element}</>)
-}
+  return ReactDOMServer.renderToStaticMarkup(<>{element}</>);
+};
 
 export const createStatickHTMLfromTree = (
   tree: Tree,
-  params?: { rId: string; id?: number; type: string },
+  params?: { rId: string; id?: number; type: string }
 ) => {
-  const uniqID = nanoid()
+  const uniqID = nanoid();
 
-  const styles = createStyleFromTree(tree, tree.area.height, uniqID)
-  const html = createHtmlFromTree(tree)
+  const styles = createStyleFromTree(tree, tree.area.height, uniqID);
+  const html = createHtmlFromTree(tree);
 
   const result = `
     <div data-rid=${params?.rId} data-id=${params?.id} data-type=${params?.type} id=link${params?.id}>
@@ -309,10 +326,10 @@ export const createStatickHTMLfromTree = (
       <div class="wrapper-element_item-content${uniqID}">${html}</div>
       </div>
     </div>
-  `.replace(/\n|\r/g, '')
+  `.replace(/\n|\r/g, "");
 
-  return result
-}
+  return result;
+};
 
 // если елемент выравнивается по окну браузера
 // на каждый ресайз нужно читать его позицию и менять
@@ -322,53 +339,47 @@ export const createStatickHTMLfromTree = (
 export const getWindowElementsPosition = () => {
   const elements = [
     // @ts-ignore
-    ...document.querySelectorAll('[data-window-relative=window]'),
-  ] as HTMLElement[]
+    ...document.querySelectorAll("[data-window-relative=window]"),
+  ] as HTMLElement[];
 
   elements.forEach((element) => {
     const childNode = element.querySelector(
-      '[data-component-id]',
-    ) as HTMLElement
+      "[data-component-id]"
+    ) as HTMLElement;
 
     if (!childNode) {
-      return
+      return;
     }
 
-    const wrapperWidth = window.innerWidth
-    const conteinerWidths = dimensions.filter((d) => d <= wrapperWidth)
+    const wrapperWidth = window.innerWidth;
+    const conteinerWidths = dimensions.filter((d) => d <= wrapperWidth);
 
-    const conteinerWidth = conteinerWidths[conteinerWidths.length - 1]
+    const conteinerWidth = conteinerWidths[conteinerWidths.length - 1];
 
-    const widthDiff = Math.ceil(wrapperWidth - conteinerWidth) / 2
+    const widthDiff = Math.ceil(wrapperWidth - conteinerWidth) / 2;
 
-    const x = Number(
-      element.getAttribute(`data-x-${conteinerWidth}`) ||
-        element.getAttribute(`data-x-${1600}`),
-    )
-    const y = Number(
-      element.getAttribute(`data-y-${conteinerWidth}`) ||
-        element.getAttribute(`data-y-${1600}`),
-    )
+    const x = Number(element.getAttribute(`data-x-${conteinerWidth}`));
+    const y = Number(element.getAttribute(`data-y-${conteinerWidth}`));
 
-    const nodeWidth = childNode.clientWidth / 2
+    const asixX = element.getAttribute(
+      `data-asixx-${conteinerWidth}`
+    ) as Attribute["style"]["asixX"];
 
-    if (wrapperWidth < conteinerWidth) {
-      return
+    if (asixX === "center") {
+      console.log("center", childNode);
+      childNode.style.transform = `translate(${x}px, ${y}px)`;
+      return;
     }
 
-    // Если х = 0, то всенда елемент тянуть влево
-    if (x === 0 || x < 0) {
-      childNode.style.transform = `translate(${x - widthDiff}px, ${y}px)`
-      return
+    // Если asixX = left, то всенда елемент тянуть влево
+    if (asixX === "left") {
+      childNode.style.transform = `translate(${x - widthDiff}px, ${y}px)`;
+      return;
     }
 
-    if (x + nodeWidth >= conteinerWidth / 2) {
-      childNode.style.transform = `translate(${x + widthDiff}px, ${y}px)`
-      return
+    if (asixX === "right") {
+      childNode.style.transform = `translate(${x + widthDiff}px, ${y}px)`;
+      return;
     }
-    if (x + nodeWidth <= conteinerWidth / 2) {
-      childNode.style.transform = `translate(${x - widthDiff}px, ${y}px)`
-      return
-    }
-  })
-}
+  });
+};

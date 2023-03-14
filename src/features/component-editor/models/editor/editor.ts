@@ -16,6 +16,7 @@ export type Attribute = {
     y: number;
     // пока что стили хранятся строкой
     styleString: string;
+    asixX: "center" | "left" | "right";
   };
 };
 
@@ -61,6 +62,7 @@ export type ElementButton = {
       backgroundColor?: string;
       color?: string;
     };
+    // TODO перенести в стили
     container: "grid" | "window";
   };
 } & Omit<Element, "type">;
@@ -91,7 +93,14 @@ const DEFAULT_ATTRIBUTES: {
   disabled: false,
   attributes: {
     1600: {
-      style: { width: 0, height: 0, x: 50, y: 50, styleString: "" },
+      style: {
+        width: 0,
+        height: 0,
+        x: 50,
+        y: 50,
+        styleString: "",
+        asixX: "center",
+      },
     },
   },
   content: "",
@@ -114,6 +123,7 @@ export const COMPONENT_TYPES: {
           x: 50,
           y: 50,
           styleString: "",
+          asixX: "center",
         },
       },
     },
@@ -138,6 +148,7 @@ export const COMPONENT_TYPES: {
           x: 300,
           y: 150,
           styleString: "",
+          asixX: "center",
         },
       },
     },
@@ -157,6 +168,7 @@ export const COMPONENT_TYPES: {
           x: 50,
           y: 150,
           styleString: "",
+          asixX: "center",
         },
       },
     },
@@ -177,6 +189,7 @@ export const COMPONENT_TYPES: {
           x: 50,
           y: 370,
           styleString: "",
+          asixX: "center",
         },
       },
     },
@@ -197,6 +210,7 @@ export const COMPONENT_TYPES: {
           x: 250,
           y: 50,
           styleString: "",
+          asixX: "center",
         },
       },
     },

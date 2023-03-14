@@ -9,6 +9,7 @@ import {
   LinkBlock,
   AreaComputedStylesBlock,
   HoverBlock,
+  AsixBlock,
 } from "./components";
 import { getStyleFromAreaWidth } from "../../utils";
 import { getElementsStyleFx } from "../../models/css-editor";
@@ -83,6 +84,7 @@ export const BoxPanelItems = ({
         activeElement={activeElement}
       />
       <ElementsSettingsBlock activeElement={activeElement} />
+      <AsixBlock contentAreaWidth={area.width} activeElement={activeElement} />
     </>
   );
 
