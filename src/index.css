@@ -38,13 +38,3 @@
   height: 30px;
   background-color: #ffa39e;
 }
-
-.react-flow__attribution {
-  display: none;
-}
-
-.div {
-  border: 1px solid red;
-  position: absolute;
-  top: 0;
-}
