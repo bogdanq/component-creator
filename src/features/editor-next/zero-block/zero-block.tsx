@@ -6,7 +6,7 @@ import ReactFlow, {
   SelectionMode,
 } from "reactflow";
 import "reactflow/dist/style.css";
-import { Selection } from "./selection";
+import { Selection } from "../selection";
 import { ZeroPanel, ZeroBlockWrapper } from "./zero-panel";
 
 const initialNodes = [

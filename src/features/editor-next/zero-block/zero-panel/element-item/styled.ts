@@ -77,7 +77,7 @@ export const OutlineSize = styled.span<{ isActive?: boolean }>`
   color: #fff;
   font-weight: normal;
   font-size: 12px;
-  bottom: -22px;
+  top: -22px;
   line-height: 20px;
   display: flex;
   justify-content: center;

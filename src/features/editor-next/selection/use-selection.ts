@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef } from "react";
 import { useReactFlow } from "reactflow";
-import { useZoom } from "../../use-zoom";
-import { addActiveElementsBySelection } from "../zero-panel";
+import { useZoom } from "../use-zoom";
+import { addActiveElementsBySelection } from "../model";
 
 const VIEWPORT_POSITION = 10;
 

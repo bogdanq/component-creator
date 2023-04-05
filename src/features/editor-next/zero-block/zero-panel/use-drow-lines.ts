@@ -1,7 +1,7 @@
 import { useStore } from "effector-react";
 import { useEffect, useRef } from "react";
-import { $activeElements, $intertSectionLines } from "./model";
-import { drowLineTo } from "./utils";
+import { $activeElements, $intertSectionLines } from "../../model";
+import { drowLineTo } from "../../utils";
 
 /**
 хук смотрит линии, у которых есть координаты и циклом их рисует

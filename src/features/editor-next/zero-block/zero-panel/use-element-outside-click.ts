@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { addActiveElement } from "./model";
+import { addActiveElement } from "../../model";
 
 export const useElementOutsideClick = () => {
   useEffect(() => {

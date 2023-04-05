@@ -22,3 +22,10 @@ export type ElementResizeParams = {
   width: number;
   height: number;
 };
+
+export type Overlay = {
+  maxX: number;
+  maxY: number;
+  minY: number;
+  minX: number;
+};
