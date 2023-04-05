@@ -179,7 +179,7 @@ export const getStickingBordersAndLines = (
       }
       // верхняя часть на странице с верхней частью активного
       if (
-        newElement.position.y >= item.position.y &&
+        newElement.position.y >= item.position.y - 1 &&
         newElement.position.y <= item.position.y + STIKING_RANGE
       ) {
         if (isValidHorizontalAlignment) {

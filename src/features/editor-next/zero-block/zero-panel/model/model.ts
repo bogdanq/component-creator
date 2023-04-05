@@ -1,4 +1,10 @@
-import { createEvent, createStore, sample } from "effector";
+import {
+  createEffect,
+  createEvent,
+  createStore,
+  guard,
+  sample,
+} from "effector";
 import { spread } from "patronum";
 import { getElementsFromSelection, getStickingBordersAndLines } from "../utils";
 import { Element, InterSectionLines, ElementResizeParams } from "./types";
@@ -34,7 +40,7 @@ export const $tree = createStore<Element[]>([
   },
   {
     id: 2,
-    position: { x: 700, y: 200 },
+    position: { x: 700, y: 174 },
     dimension: {
       width: 50,
       height: 30,
@@ -43,7 +49,7 @@ export const $tree = createStore<Element[]>([
   },
   {
     id: 3,
-    position: { x: 300, y: 300 },
+    position: { x: 300, y: 173 },
     type: "shape",
     dimension: {
       width: 200,
@@ -51,6 +57,42 @@ export const $tree = createStore<Element[]>([
     },
   },
 ]);
+
+const drowOverlay = createEffect<Element[], void>((activeElements) => {
+  const div = document.createElement("div");
+  div.className = "overlay-root";
+
+  document.body.querySelector(".overlay-root")?.remove();
+
+  if (activeElements.length < 2) {
+    return;
+  }
+
+  const rect = activeElements.reduce(
+    (acc, element) => {
+      return {
+        minX: Math.min(acc.minX, element.position.x),
+        maxX: Math.max(acc.maxX, element.position.x + element.dimension.width),
+        minY: Math.min(acc.minY, element.position.y),
+        maxY: Math.max(acc.maxY, element.position.y + element.dimension.height),
+      };
+    },
+    {
+      maxX: 0,
+      maxY: 0,
+      minY: Infinity,
+      minX: Infinity,
+    }
+  );
+
+  div.style.top = `${rect.minY - 2}px`;
+  div.style.left = `${rect.minX - 2}px`;
+  div.style.height = `${rect.maxY - rect.minY + 4}px`;
+  div.style.width = `${rect.maxX - rect.minX + 4}px`;
+  div.style.zIndex = "-1";
+
+  document.body.querySelector(".zero-panel")?.appendChild(div);
+});
 
 export const $intertSectionLines = createStore<InterSectionLines[]>([]);
 
@@ -151,4 +193,18 @@ sample({
     return getElementsFromSelection(tree, positions);
   },
   target: $activeElements,
+});
+
+// TODO проверить логику направляющих
+sample({
+  clock: guard($activeElements, { filter: (elements) => !elements.length }),
+  fn() {
+    return [];
+  },
+  target: $intertSectionLines,
+});
+
+sample({
+  clock: $activeElements,
+  target: drowOverlay,
 });

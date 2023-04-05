@@ -107,27 +107,14 @@ export const ElementWrapper = styled.div<{
   width: 0;
 
   &:hover .handle1 {
-    ${({ isDragged }) =>
-      !isDragged &&
-      css`
-        border: 1px solid #8b8bea;
-      `}
+    border: 1px solid #8b8bea;
   }
 
-  ${({ isActive, isDragged }) =>
+  ${({ isActive }) =>
     isActive &&
-    !isDragged &&
     css`
       & .handle1 {
         border: 1px solid #8b8bea;
-      }
-    `}
-
-  ${({ isDragged }) =>
-    isDragged &&
-    css`
-      & .handle1 {
-        border: 1px solid transparent;
       }
     `}
 `;

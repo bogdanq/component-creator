@@ -37,4 +37,9 @@ export const globalCss = css`
     position: absolute;
     top: 0;
   }
+
+  .overlay-root {
+    border: 1.5px solid #8b8bea;
+    position: absolute;
+  }
 `;

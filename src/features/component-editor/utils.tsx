@@ -290,8 +290,6 @@ export const createHtmlFromTree = (tree: Tree) => {
       return acc;
     }, {});
 
-    console.log("asix", asix);
-
     return (
       <div
         key={id}
@@ -366,7 +364,6 @@ export const getWindowElementsPosition = () => {
     ) as Attribute["style"]["asixX"];
 
     if (asixX === "center") {
-      console.log("center", childNode);
       childNode.style.transform = `translate(${x}px, ${y}px)`;
       return;
     }
