@@ -1,42 +1,7 @@
-import { Resizable, ResizableProps } from "re-resizable";
-import styled from "@emotion/styled";
-import { css } from "@emotion/react";
 import { Element, handleChangeElementSize } from "../../../model";
 import { useCallback } from "react";
 import { useZoom } from "../../../use-zoom";
-
-//@ts-ignore
-const Wrapper = styled(Resizable)<ResizableProps & { isActive: boolean }>`
-  ${({ isActive }) =>
-    isActive &&
-    css`
-      &:after {
-        content: "";
-        position: absolute;
-        background: #fff;
-        border: 1px solid #8b8bea;
-        right: -7px;
-        width: 10px;
-        height: 10px;
-        top: 50%;
-        transform: translateY(-50%);
-        pointer-events: none;
-      }
-
-      &:before {
-        content: "";
-        position: absolute;
-        background: #fff;
-        border: 1px solid #8b8bea;
-        left: 50%;
-        width: 10px;
-        height: 10px;
-        bottom: -7px;
-        transform: translateX(-50%);
-        pointer-events: none;
-      }
-    `}
-`;
+import { ResizablePoints } from "../../../ui";
 
 export const ResizableWrapper = ({
   children,
@@ -58,7 +23,7 @@ export const ResizableWrapper = ({
   }, []);
 
   return (
-    <Wrapper
+    <ResizablePoints
       isActive={isActive}
       className="handle1"
       size={{
@@ -74,6 +39,6 @@ export const ResizableWrapper = ({
       }}
     >
       {children}
-    </Wrapper>
+    </ResizablePoints>
   );
 };

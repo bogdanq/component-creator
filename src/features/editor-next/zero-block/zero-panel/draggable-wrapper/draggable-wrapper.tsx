@@ -1,11 +1,7 @@
 import Draggable, { DraggableData } from "react-draggable";
 import { useZoom } from "../../../use-zoom";
 import { useCallback } from "react";
-import {
-  Element,
-  addActiveElement,
-  handleChangeElementPosition,
-} from "../../../model";
+import { Element, handleChangeElementPosition } from "../../../model";
 
 export const DraggableWrapper = ({
   children,
@@ -17,12 +13,12 @@ export const DraggableWrapper = ({
   const zoom = useZoom();
 
   const handleChangePosition = useCallback(
-    ({ x, y }: DraggableData, id: number, isDragged: boolean) => {
+    ({ x, y, lastX, lastY }: DraggableData, id: number, isDragged: boolean) => {
       handleChangeElementPosition({
-        x,
-        y,
+        position: { x, y },
         id,
         isDragged,
+        startPosition: { x: lastX, y: lastY },
       });
     },
     []
@@ -41,7 +37,6 @@ export const DraggableWrapper = ({
       onStop={(_, dragData) =>
         handleChangePosition(dragData, element.id, false)
       }
-      onMouseDown={() => addActiveElement(element)}
     >
       {children}
     </Draggable>

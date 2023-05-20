@@ -81,9 +81,9 @@ export const getStickingBordersAndLines = (
 
         acc.interSectionLines.push({
           startX: rightSide,
-          startY: item.position.y + item.dimension.height,
           endX: rightSide,
-          endY: newElement.position.y,
+          endY: 2000,
+          startY: 0,
         });
       }
       // правая часть на странице с правой частью активного
@@ -104,9 +104,9 @@ export const getStickingBordersAndLines = (
 
         acc.interSectionLines.push({
           startX: rightSide,
-          startY: item.position.y + item.dimension.height,
           endX: rightSide,
-          endY: newElement.position.y,
+          endY: 2000,
+          startY: 0,
         });
       }
 
@@ -128,9 +128,9 @@ export const getStickingBordersAndLines = (
 
         acc.interSectionLines.push({
           startX: item.position.x,
-          startY: item.position.y + item.dimension.height,
           endX: item.position.x,
-          endY: newElement.position.y,
+          endY: 2000,
+          startY: 0,
         });
       }
       // левая часть на странице с левой частью активного
@@ -147,9 +147,9 @@ export const getStickingBordersAndLines = (
 
         acc.interSectionLines.push({
           startX: item.position.x,
-          startY: item.position.y + item.dimension.height,
           endX: item.position.x,
-          endY: newElement.position.y,
+          endY: 2000,
+          startY: 0,
         });
       }
 
@@ -171,10 +171,10 @@ export const getStickingBordersAndLines = (
         }
 
         acc.interSectionLines.push({
-          startX: item.position.x + item.dimension.height,
           startY: item.position.y,
-          endX: newElement.position.x,
           endY: item.position.y,
+          endX: 2000,
+          startX: 0,
         });
       }
       // верхняя часть на странице с верхней частью активного
@@ -193,10 +193,10 @@ export const getStickingBordersAndLines = (
         }
 
         acc.interSectionLines.push({
-          startX: item.position.x,
           startY: item.position.y,
-          endX: newElement.position.x,
           endY: item.position.y,
+          endX: 2000,
+          startX: 0,
         });
       }
 
@@ -217,10 +217,10 @@ export const getStickingBordersAndLines = (
         }
 
         acc.interSectionLines.push({
-          startX: item.position.x + item.dimension.width,
           startY: item.position.y + item.dimension.height,
-          endX: newElement.position.x,
           endY: item.position.y + item.dimension.height,
+          endX: 2000,
+          startX: 0,
         });
       }
       // нижняя часть на странице с нижней частью активного
@@ -244,10 +244,10 @@ export const getStickingBordersAndLines = (
         }
 
         acc.interSectionLines.push({
-          startX: item.position.x + item.dimension.width,
           startY: item.position.y + item.dimension.height,
-          endX: newElement.position.x,
           endY: item.position.y + item.dimension.height,
+          endX: 2000,
+          startX: 0,
         });
       }
 

@@ -12,8 +12,8 @@ export const handleChangeElementSize = createEvent<ElementResizeParams>();
 
 export const handleChangeElementPosition = createEvent<{
   id: number;
-  x: number;
-  y: number;
+  position: { x: number; y: number };
+  startPosition: { x: number; y: number };
   isDragged?: boolean;
 }>();
 
@@ -76,9 +76,9 @@ $activeElements
 
 // расчет позиции при прилипании и сохранение линий пересечения
 sample({
-  source: $tree,
+  source: [$tree, $activeElements],
   clock: handleChangeElementPosition,
-  fn(tree, { id, x, y, isDragged }) {
+  fn([tree, activeElements], { id, position, startPosition, isDragged }) {
     let lines: InterSectionLines[] = [];
 
     return {
@@ -89,8 +89,8 @@ sample({
             {
               ...item,
               position: {
-                x,
-                y,
+                x: position.x,
+                y: position.y,
                 isDragged,
               },
             }
@@ -101,15 +101,39 @@ sample({
           return element;
         }
 
+        if (activeElements.find((i) => i.id === item.id) && item.id !== id) {
+          return {
+            ...item,
+            position: {
+              ...item.position,
+              x:
+                Number(startPosition?.x) > position.x
+                  ? item.position.x - (Number(startPosition?.x) - position.x)
+                  : item.position.x + position.x - Number(startPosition?.x),
+
+              y:
+                Number(startPosition?.y) > position.y
+                  ? item.position.y - (Number(startPosition?.y) - position.y)
+                  : item.position.y + position.y - Number(startPosition?.y),
+            },
+          };
+        }
+
         return item;
       }),
-      intertSectionLines: lines,
+      activeElements: activeElements.map((element) => {
+        const nextElement = tree.find((i) => i.id === element.id);
+
+        return nextElement ? nextElement : element;
+      }),
+      lines,
     };
   },
   target: spread({
     targets: {
       tree: $tree,
       intertSectionLines: $intertSectionLines,
+      activeElements: $activeElements,
     },
   }),
 });
@@ -206,5 +230,3 @@ sample({
   },
   target: $overlay,
 });
-
-$activeElements.watch(console.log);

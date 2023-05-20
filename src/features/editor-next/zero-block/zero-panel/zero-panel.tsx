@@ -6,6 +6,7 @@ import { OutlineSize, ElementItem, ElementWrapper } from "./element-item";
 import { Overlay } from "./overlay";
 import { ResizableWrapper } from "./resizable-wrapper";
 import { DraggableWrapper } from "./draggable-wrapper";
+import { addActiveElement } from "../../model";
 
 export const ZeroPanel = () => {
   const tree = useStore($tree);
@@ -29,7 +30,10 @@ export const ZeroPanel = () => {
           (element) => element.id === item.id
         );
 
-        const isVisibleSize = !!activeElement && !item.position.isDragged;
+        const isVisibleSize =
+          !!activeElement &&
+          !item.position.isDragged &&
+          activeElements.length < 2;
 
         return (
           <ElementWrapper
@@ -37,10 +41,18 @@ export const ZeroPanel = () => {
             isDragged={item.position.isDragged}
             key={item.id}
             data-component-id={item.id}
+            onMouseDown={() => {
+              if (activeElements.length < 2) {
+                addActiveElement(item);
+              }
+            }}
           >
             <DraggableWrapper element={item}>
               <div>
-                <ResizableWrapper isActive={!!activeElement} element={item}>
+                <ResizableWrapper
+                  isActive={!!activeElement && activeElements.length === 1}
+                  element={item}
+                >
                   <>
                     <ElementItem element={item} />
 
